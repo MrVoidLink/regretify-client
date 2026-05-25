@@ -1,0 +1,95 @@
+import type { PulseSocialCard } from "@/features/market-pulse/types";
+
+export const internetLosingMindCards: PulseSocialCard[] = [
+  {
+    id: "whale-twitter",
+    platform: "twitter",
+    timeAgo: "2h ago",
+    title: '"Whales don\'t sleep."',
+    accentLine: "$BTC moves.",
+    metrics: {
+      replies: "312",
+      reposts: "1.2K",
+      likes: "4.7K",
+    },
+    imageSrc: "/images/market-pulse/social-whale-v1.png",
+  },
+  {
+    id: "astronaut-reddit",
+    platform: "reddit",
+    timeAgo: "3h ago",
+    title: "When you buy high and still HODL",
+    accentLine: "Diamond hands only.",
+    metrics: {
+      replies: "237",
+      reposts: "892",
+      likes: "3.1K",
+    },
+    imageSrc: "/images/market-pulse/social-astronaut-v1.png",
+  },
+  {
+    id: "cat-tiktok",
+    platform: "tiktok",
+    timeAgo: "4h ago",
+    title: "Just woke up and checked my bags",
+    accentLine: "Mood: concerned.",
+    metrics: {
+      replies: "156",
+      reposts: "672",
+      likes: "2.4K",
+    },
+    imageSrc: "/images/market-pulse/social-cat-v1.png",
+  },
+  {
+    id: "mascot-discord",
+    platform: "discord",
+    timeAgo: "5h ago",
+    title: "Another day, another chart.",
+    accentLine: "Coffee first.",
+    metrics: {
+      replies: "98",
+      reposts: "420",
+      likes: "1.8K",
+    },
+    imageSrc: "/images/market-pulse/social-mascot-v1.png",
+  },
+  {
+    id: "late-entry-twitter",
+    platform: "twitter",
+    timeAgo: "6h ago",
+    title: "Bought the breakout. Immediately respected the top.",
+    accentLine: "Perfect timing, wrong direction.",
+    metrics: {
+      replies: "84",
+      reposts: "302",
+      likes: "1.1K",
+    },
+    fallbackTone: "midnight",
+  },
+  {
+    id: "macro-reddit",
+    platform: "reddit",
+    timeAgo: "7h ago",
+    title: "Everyone wanted memes. Bonds quietly won the week.",
+    accentLine: "Low drama, high pain.",
+    metrics: {
+      replies: "61",
+      reposts: "210",
+      likes: "932",
+    },
+    fallbackTone: "emerald",
+  },
+  {
+    id: "discord-copium",
+    platform: "discord",
+    timeAgo: "8h ago",
+    title: "Portfolio down, confidence somehow still up.",
+    accentLine: "Copium remains undefeated.",
+    metrics: {
+      replies: "129",
+      reposts: "388",
+      likes: "1.4K",
+    },
+    fallbackTone: "violet",
+  },
+];

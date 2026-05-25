@@ -3,24 +3,347 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Regretify UI brand */
+  --color-brand: #6f43ff;
+  --color-brand-strong: #5c2ce9;
+  --color-brand-soft: #f5efff;
+  --color-brand-soft-strong: #ece2ff;
+  --color-brand-border: #d9c9ff;
+  --color-brand-muted: #8b6dff;
+  /* Shared surfaces and borders */
+  --color-surface-base: #ffffff;
+  --color-surface-subtle: #fafafa;
+  --color-surface-muted: #f4f4f5;
+  --color-border-subtle: rgba(24, 24, 27, 0.08);
+  --color-border-strong: rgba(24, 24, 27, 0.14);
+  /* Shared text hierarchy */
+  --color-text-soft: #52525b;
+  --color-text-muted: #71717a;
+  /* Semantic states for UI, not asset identities */
+  --color-success: #059669;
+  --color-success-soft: #ecfdf5;
+  --color-success-border: #a7f3d0;
+  --color-warning: #d97706;
+  --color-warning-soft: #fff7ed;
+  --color-warning-border: #fdba74;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-danger-border: #fca5a5;
+  /* Typography rhythm for Urbanist */
+  --tracking-display: 0.01em;
+  --word-spacing-display: -0.14em;
+  --leading-display: 0.98;
+  --tracking-title: 0.005em;
+  --word-spacing-title: -0.08em;
+  --leading-title: 1.02;
+  --tracking-copy: 0.004em;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-ui: var(--color-brand);
+  --color-brand-ui-strong: var(--color-brand-strong);
+  --color-brand-ui-soft: var(--color-brand-soft);
+  --color-brand-ui-soft-strong: var(--color-brand-soft-strong);
+  --color-brand-ui-border: var(--color-brand-border);
+  --color-brand-ui-muted: var(--color-brand-muted);
+  --color-surface-ui-base: var(--color-surface-base);
+  --color-surface-ui-subtle: var(--color-surface-subtle);
+  --color-surface-ui-muted: var(--color-surface-muted);
+  --color-border-ui-subtle: var(--color-border-subtle);
+  --color-border-ui-strong: var(--color-border-strong);
+  --color-text-ui-soft: var(--color-text-soft);
+  --color-text-ui-muted: var(--color-text-muted);
+  --color-success-ui: var(--color-success);
+  --color-success-ui-soft: var(--color-success-soft);
+  --color-success-ui-border: var(--color-success-border);
+  --color-warning-ui: var(--color-warning);
+  --color-warning-ui-soft: var(--color-warning-soft);
+  --color-warning-ui-border: var(--color-warning-border);
+  --color-danger-ui: var(--color-danger);
+  --color-danger-ui-soft: var(--color-danger-soft);
+  --color-danger-ui-border: var(--color-danger-border);
+  --font-sans: var(--font-ui-sans);
+  --font-mono: var(--font-ui-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  letter-spacing: var(--tracking-copy);
+}
+
+.type-display {
+  letter-spacing: var(--tracking-display);
+  word-spacing: var(--word-spacing-display);
+  line-height: var(--leading-display);
+}
+
+.type-title {
+  letter-spacing: var(--tracking-title);
+  word-spacing: var(--word-spacing-title);
+  line-height: var(--leading-title);
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.sidebar-scrollbar {
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+}
+
+.sidebar-scrollbar:hover,
+.sidebar-scrollbar:focus-within {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(161, 161, 170, 0.42) transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.sidebar-scrollbar:hover::-webkit-scrollbar,
+.sidebar-scrollbar:focus-within::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+  background-color: transparent;
+  transition: background-color 180ms ease;
+}
+
+.sidebar-scrollbar:hover::-webkit-scrollbar-thumb,
+.sidebar-scrollbar:focus-within::-webkit-scrollbar-thumb {
+  background-color: rgba(161, 161, 170, 0.42);
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(113, 113, 122, 0.58);
+}
+
+/* Mobile-only profile system for the calculator hero and market picker. */
+@media (max-width: 47.999rem) {
+  .mobile-profile-grid {
+    --mobile-hero-min: 10.5rem;
+    --mobile-hero-max: 3fr;
+    --mobile-market-min: 11.5rem;
+    --mobile-market-max: 2fr;
+    --mobile-grid-gap: 0.625rem;
+    --mobile-grid-py: 0.625rem;
+    --mobile-stage-shell-p: 0.625rem;
+    --mobile-market-shell-p: 0.75rem;
+    --mobile-stage-copy-max: 13rem;
+    --mobile-stage-copy-size: 0.84rem;
+    --mobile-stage-copy-line: 1.4;
+    --mobile-stage-copy-spacing: 0.625rem;
+    grid-template-rows: minmax(var(--mobile-hero-min), var(--mobile-hero-max))
+      minmax(var(--mobile-market-min), var(--mobile-market-max));
+    gap: var(--mobile-grid-gap);
+    padding-top: var(--mobile-grid-py);
+    padding-bottom: var(--mobile-grid-py);
+  }
+
+  .mobile-stage-shell {
+    padding: var(--mobile-stage-shell-p);
+  }
+
+  .mobile-market-shell {
+    padding: var(--mobile-market-shell-p);
+  }
+
+  .mobile-stage-copy {
+    max-width: var(--mobile-stage-copy-max);
+    font-size: var(--mobile-stage-copy-size);
+    line-height: var(--mobile-stage-copy-line);
+  }
+
+  .mobile-stage-copy p {
+    margin-top: var(--mobile-stage-copy-spacing);
+    max-width: var(--mobile-stage-copy-max);
+  }
+
+  .mobile-market-layout {
+    --mobile-market-heading-size: 1.34rem;
+    --mobile-market-desc-size: 0.68rem;
+    --mobile-market-desc-max: 16rem;
+    --mobile-market-card-width: 6.1rem;
+    --mobile-market-card-px: 0.58rem;
+    --mobile-market-card-py: 0.78rem;
+    --mobile-market-icon-wrap: 3.55rem;
+    --mobile-market-title-size: 0.71rem;
+    --mobile-market-text-size: 0.55rem;
+    --mobile-market-row-gap: 0.42rem;
+  }
+
+  .mobile-market-heading {
+    font-size: var(--mobile-market-heading-size);
+  }
+
+  .mobile-market-description {
+    max-width: var(--mobile-market-desc-max);
+    font-size: var(--mobile-market-desc-size);
+  }
+
+  .mobile-market-row {
+    gap: var(--mobile-market-row-gap);
+  }
+
+  .mobile-market-card {
+    width: var(--mobile-market-card-width);
+    padding-inline: var(--mobile-market-card-px);
+    padding-block: var(--mobile-market-card-py);
+  }
+
+  .mobile-market-icon-wrap {
+    width: var(--mobile-market-icon-wrap);
+    height: var(--mobile-market-icon-wrap);
+  }
+
+  .mobile-market-title {
+    font-size: var(--mobile-market-title-size);
+  }
+
+  .mobile-market-text {
+    font-size: var(--mobile-market-text-size);
+  }
+}
+
+/* Compact mobile anchor: ~360 x 740 */
+@media (max-width: 23.4375rem) {
+  .mobile-profile-grid {
+    --mobile-hero-min: 9.1rem;
+    --mobile-hero-max: 11fr;
+    --mobile-market-min: 13rem;
+    --mobile-market-max: 9fr;
+    --mobile-grid-gap: 0.5rem;
+    --mobile-grid-py: 0.5rem;
+    --mobile-stage-shell-p: 0.625rem;
+    --mobile-market-shell-p: 0.625rem;
+    --mobile-stage-copy-max: 11rem;
+    --mobile-stage-copy-size: 0.8rem;
+    --mobile-stage-copy-spacing: 0.5rem;
+  }
+
+  .mobile-market-layout {
+    --mobile-market-heading-size: 1.22rem;
+    --mobile-market-desc-size: 0.62rem;
+    --mobile-market-desc-max: 12.25rem;
+    --mobile-market-card-width: 5.75rem;
+    --mobile-market-card-px: 0.5rem;
+    --mobile-market-card-py: 0.72rem;
+    --mobile-market-icon-wrap: 3.25rem;
+    --mobile-market-title-size: 0.66rem;
+    --mobile-market-text-size: 0.5rem;
+    --mobile-market-row-gap: 0.36rem;
+  }
+}
+
+/* Standard mobile anchor: ~390 x 844 */
+@media (min-width: 23.5rem) and (max-width: 25.0625rem) {
+  .mobile-profile-grid {
+    --mobile-hero-min: 10rem;
+    --mobile-hero-max: 3fr;
+    --mobile-market-min: 12.2rem;
+    --mobile-market-max: 2fr;
+    --mobile-stage-copy-max: 12rem;
+    --mobile-stage-copy-size: 0.82rem;
+  }
+
+  .mobile-market-layout {
+    --mobile-market-heading-size: 1.3rem;
+    --mobile-market-desc-size: 0.66rem;
+    --mobile-market-desc-max: 14rem;
+    --mobile-market-card-width: 6rem;
+    --mobile-market-card-px: 0.56rem;
+    --mobile-market-card-py: 0.76rem;
+    --mobile-market-icon-wrap: 3.45rem;
+    --mobile-market-title-size: 0.69rem;
+    --mobile-market-text-size: 0.53rem;
+    --mobile-market-row-gap: 0.4rem;
+  }
+}
+
+/* Large Android anchor: ~412 x 915 */
+@media (min-width: 25.125rem) and (max-width: 26.1875rem) {
+  .mobile-profile-grid {
+    --mobile-hero-min: 10.8rem;
+    --mobile-hero-max: 11fr;
+    --mobile-market-min: 12rem;
+    --mobile-market-max: 9fr;
+    --mobile-stage-copy-max: 12.75rem;
+    --mobile-stage-copy-size: 0.835rem;
+  }
+
+  .mobile-market-layout {
+    --mobile-market-heading-size: 1.36rem;
+    --mobile-market-desc-size: 0.68rem;
+    --mobile-market-desc-max: 15rem;
+    --mobile-market-card-width: 6.22rem;
+    --mobile-market-card-px: 0.58rem;
+    --mobile-market-card-py: 0.78rem;
+    --mobile-market-icon-wrap: 3.65rem;
+    --mobile-market-title-size: 0.71rem;
+    --mobile-market-text-size: 0.55rem;
+    --mobile-market-row-gap: 0.42rem;
+  }
+}
+
+/* Tall Max anchor: ~430 x 932 */
+@media (min-width: 26.25rem) and (max-width: 47.999rem) {
+  .mobile-profile-grid {
+    --mobile-hero-min: 11.25rem;
+    --mobile-hero-max: 12fr;
+    --mobile-market-min: 11.8rem;
+    --mobile-market-max: 8fr;
+    --mobile-stage-copy-max: 13.5rem;
+    --mobile-stage-copy-size: 0.86rem;
+  }
+
+  .mobile-market-layout {
+    --mobile-market-heading-size: 1.38rem;
+    --mobile-market-desc-size: 0.69rem;
+    --mobile-market-desc-max: 15.5rem;
+    --mobile-market-card-width: 6.45rem;
+    --mobile-market-card-px: 0.6rem;
+    --mobile-market-card-py: 0.8rem;
+    --mobile-market-icon-wrap: 3.85rem;
+    --mobile-market-title-size: 0.73rem;
+    --mobile-market-text-size: 0.56rem;
+    --mobile-market-row-gap: 0.44rem;
+  }
+}
+
+/* Short-height override for landscape-like or vertically constrained phones. */
+@media (max-width: 30rem) and (max-height: 53rem) {
+  .mobile-profile-grid {
+    --mobile-hero-min: 9rem;
+    --mobile-hero-max: 11fr;
+    --mobile-market-min: 13.2rem;
+    --mobile-market-max: 9fr;
+    --mobile-grid-gap: 0.45rem;
+    --mobile-grid-py: 0.45rem;
+    --mobile-stage-copy-max: 10.5rem;
+    --mobile-stage-copy-size: 0.78rem;
+  }
 }

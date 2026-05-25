@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Regretify Home Wireframe - Tablet</title>
+    <style>
+      body {
+        margin: 0;
+        background: #f4f1eb;
+        color: #202020;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      .page {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 24px 20px 40px;
+      }
+
+      .box {
+        border: 2px solid #202020;
+        border-radius: 24px;
+        background: #fff;
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 20px;
+      }
+
+      .hero {
+        margin-top: 24px;
+        display: grid;
+        gap: 20px;
+      }
+
+      .intro {
+        padding: 24px;
+      }
+
+      .intro h1 {
+        margin: 16px 0 0;
+        font-size: 48px;
+      }
+
+      .intro p {
+        margin: 16px 0 0;
+        color: #666;
+        line-height: 1.6;
+      }
+
+      .scene {
+        min-height: 360px;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        border: 2px dashed #202020;
+        border-radius: 28px;
+        color: #666;
+      }
+
+      .markets {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .market {
+        min-height: 132px;
+        padding: 18px;
+      }
+
+      .market.active {
+        outline: 4px dashed #8d68ff;
+      }
+
+      .controls,
+      .power {
+        padding: 20px;
+      }
+
+      .controls-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .control-item {
+        min-height: 82px;
+        border: 2px solid #d4cec3;
+        border-radius: 18px;
+        padding: 14px;
+      }
+
+      .label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="nav box">
+        <strong>Regretify</strong>
+        <span>Tablet nav / compact menu</span>
+      </section>
+
+      <section class="hero">
+        <section class="intro box">
+          <div class="label">Hero</div>
+          <h1>Take your shot</h1>
+          <p>
+            Tablet keeps the hero message first, then the visual scene, then
+            market options and controls.
+          </p>
+        </section>
+
+        <section class="scene">Character + target scene</section>
+
+        <section class="markets">
+          <article class="market box active">
+            <div class="label">Market</div>
+            <h3>Crypto</h3>
+          </article>
+          <article class="market box">
+            <div class="label">Market</div>
+            <h3>Stocks</h3>
+          </article>
+          <article class="market box">
+            <div class="label">Market</div>
+            <h3>Commodities</h3>
+          </article>
+          <article class="market box">
+            <div class="label">Sponsored</div>
+            <h3>Exchange Slot</h3>
+          </article>
+        </section>
+
+        <section class="controls box">
+          <div class="label">Controls</div>
+          <div class="controls-grid">
+            <div class="control-item">Drag</div>
+            <div class="control-item">Angle</div>
+            <div class="control-item">Release</div>
+            <div class="control-item">Wind</div>
+          </div>
+        </section>
+
+        <section class="power box">
+          <div class="label">Live State</div>
+          <strong>Angle + Power panel</strong>
+        </section>
+      </section>
+    </div>
+  </body>
+</html>

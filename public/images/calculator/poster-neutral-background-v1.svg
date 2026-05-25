@@ -1,0 +1,59 @@
+<svg width="920" height="1240" viewBox="0 0 920 1240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgBase" x1="460" y1="0" x2="460" y2="1240" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FAF8FF"/>
+    </linearGradient>
+    <radialGradient id="chartUnderGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(704 564) rotate(90) scale(214 274)">
+      <stop stop-color="#C8B2FF" stop-opacity="0.56"/>
+      <stop offset="0.48" stop-color="#D7C7FF" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="lineFade" x1="390" y1="0" x2="882" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#CFC2FF" stop-opacity="0"/>
+      <stop offset="0.18" stop-color="#CFC2FF" stop-opacity="0.44"/>
+      <stop offset="0.64" stop-color="#AE90FF" stop-opacity="0.82"/>
+      <stop offset="1" stop-color="#8C66FF"/>
+    </linearGradient>
+    <linearGradient id="fillFade" x1="642" y1="318" x2="642" y2="690" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#CEBBFF" stop-opacity="0.34"/>
+      <stop offset="0.48" stop-color="#DCCFFF" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#F7F3FF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="lineSoft" x="360" y="282" width="556" height="448" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="4.5" result="effect1_foregroundBlur"/>
+    </filter>
+    <filter id="areaBloom" x="320" y="328" width="638" height="486" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="24" result="effect1_foregroundBlur"/>
+    </filter>
+  </defs>
+
+  <rect width="920" height="1240" rx="42" fill="url(#bgBase)"/>
+  <rect x="1" y="1" width="918" height="1238" rx="41" stroke="#E8DEFF" stroke-opacity="0.9" stroke-width="2"/>
+
+  <g opacity="0.78">
+    <path d="M476 276V704" stroke="#E9E1FF" stroke-width="2" stroke-dasharray="6 10"/>
+    <path d="M578 276V704" stroke="#E9E1FF" stroke-width="2" stroke-dasharray="6 10"/>
+    <path d="M680 276V704" stroke="#E9E1FF" stroke-width="2" stroke-dasharray="6 10"/>
+    <path d="M782 276V704" stroke="#E9E1FF" stroke-width="2" stroke-dasharray="6 10"/>
+    <path d="M884 276V704" stroke="#E9E1FF" stroke-width="2" stroke-dasharray="6 10"/>
+    <path d="M448 390H890" stroke="#EEE7FF" stroke-width="2" stroke-dasharray="6 10"/>
+    <path d="M448 502H890" stroke="#EEE7FF" stroke-width="2" stroke-dasharray="6 10"/>
+    <path d="M448 614H890" stroke="#EEE7FF" stroke-width="2" stroke-dasharray="6 10"/>
+  </g>
+
+  <g filter="url(#areaBloom)" opacity="0.74">
+    <path d="M392 604C417 620 437 577 462 590C487 603 509 620 536 610C560 601 585 557 610 562C642 569 653 608 681 596C702 587 715 553 736 545C754 539 772 552 792 539C808 529 815 495 832 491C850 487 859 507 882 490V718H392V604Z" fill="url(#chartUnderGlow)"/>
+  </g>
+  <path d="M392 604C417 620 437 577 462 590C487 603 509 620 536 610C560 601 585 557 610 562C642 569 653 608 681 596C702 587 715 553 736 545C754 539 772 552 792 539C808 529 815 495 832 491C850 487 859 507 882 490V704H392V604Z" fill="url(#fillFade)"/>
+
+  <g filter="url(#lineSoft)" opacity="0.48">
+    <path d="M392 604C417 620 437 577 462 590C487 603 509 620 536 610C560 601 585 557 610 562C642 569 653 608 681 596C702 587 715 553 736 545C754 539 772 552 792 539C808 529 815 495 832 491C850 487 859 507 882 490" stroke="#BEA7FF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <path d="M392 604C417 620 437 577 462 590C487 603 509 620 536 610C560 601 585 557 610 562C642 569 653 608 681 596C702 587 715 553 736 545C754 539 772 552 792 539C808 529 815 495 832 491C850 487 859 507 882 490" stroke="url(#lineFade)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

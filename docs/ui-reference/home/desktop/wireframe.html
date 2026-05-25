@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Regretify Home Wireframe - Desktop</title>
+    <style>
+      :root {
+        --bg: #ece8e1;
+        --card: #ffffff;
+        --line: #1b1b1b;
+        --soft: #dbd6ce;
+        --muted: #6c6c6c;
+        --accent: #ff7a1c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #d8d3cc;
+        font-family: Arial, Helvetica, sans-serif;
+        overflow: hidden;
+      }
+
+      .viewport {
+        height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 12px;
+      }
+
+      .artboard {
+        width: min(calc(100vw - 24px), calc((100vh - 24px) * 1.5));
+        aspect-ratio: 3 / 2;
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        background: radial-gradient(circle at 85% 44%, rgba(255, 194, 128, 0.4), transparent 16%),
+          linear-gradient(180deg, #f6f4ef 0%, #ede8e1 100%);
+        color: var(--line);
+      }
+
+      .topbar {
+        position: absolute;
+        inset: 3.5% 2.5% auto 2.5%;
+        display: grid;
+        grid-template-columns: 18% 1fr 8%;
+        align-items: center;
+      }
+
+      .brand {
+        font-size: clamp(20px, 1.9vw, 34px);
+        font-weight: 700;
+      }
+
+      .nav {
+        display: flex;
+        justify-content: center;
+        gap: 5%;
+        font-size: clamp(11px, 0.9vw, 18px);
+      }
+
+      .menu {
+        justify-self: end;
+        width: 24%;
+        min-width: 46px;
+        aspect-ratio: 1;
+        border: 2px solid var(--line);
+        border-radius: 18px;
+        display: grid;
+        place-items: center;
+        background: var(--card);
+        font-size: 11px;
+      }
+
+      .left-copy {
+        position: absolute;
+        left: 2.5%;
+        top: 13.5%;
+        width: 22%;
+      }
+
+      .eyebrow {
+        width: 12%;
+        height: 0.7vw;
+        min-height: 8px;
+        max-height: 12px;
+        border-radius: 999px;
+        background: var(--accent);
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      .left-copy h2 {
+        margin-top: 8%;
+        font-size: clamp(22px, 2.25vw, 42px);
+        line-height: 1.08;
+      }
+
+      .left-copy p {
+        margin-top: 5%;
+        color: var(--muted);
+        font-size: clamp(12px, 1vw, 20px);
+        line-height: 1.5;
+      }
+
+      .market-list {
+        margin-top: 8%;
+        display: grid;
+        gap: 2.2%;
+      }
+
+      .market-card {
+        min-height: 10.8vw;
+        border: 2px solid var(--soft);
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.86);
+        padding: 8% 8%;
+      }
+
+      .market-card.active {
+        border-color: var(--accent);
+      }
+
+      .market-card h3 {
+        margin-top: 5%;
+        font-size: clamp(17px, 1.6vw, 30px);
+      }
+
+      .market-card p,
+      .market-card small {
+        margin-top: 5%;
+        display: block;
+        color: var(--muted);
+        font-size: clamp(11px, 0.95vw, 17px);
+        line-height: 1.45;
+      }
+
+      .hero-copy {
+        position: absolute;
+        left: 38%;
+        right: 18%;
+        top: 15.5%;
+        text-align: center;
+      }
+
+      .hero-copy h1 {
+        font-size: clamp(40px, 4.2vw, 78px);
+        line-height: 1;
+      }
+
+      .hero-copy p {
+        margin-top: 3%;
+        color: var(--muted);
+        font-size: clamp(18px, 1.7vw, 32px);
+      }
+
+      .help {
+        position: absolute;
+        right: 3.5%;
+        top: 15%;
+        width: 3.8%;
+        min-width: 44px;
+        aspect-ratio: 1;
+        border-radius: 999px;
+        border: 2px solid var(--soft);
+        background: var(--card);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+      }
+
+      .scene {
+        position: absolute;
+        left: 31%;
+        right: 5.5%;
+        top: 28%;
+        bottom: 20%;
+        border: 2px dashed var(--line);
+        border-radius: 32px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        text-align: center;
+        padding: 24px;
+      }
+
+      .controls,
+      .power {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.92);
+        border: 2px solid var(--soft);
+        border-radius: 26px;
+        box-shadow: 0 18px 46px rgba(20, 20, 20, 0.08);
+      }
+
+      .controls {
+        left: 29.8%;
+        right: 6.2%;
+        bottom: 16.8%;
+        min-height: 9%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .control {
+        padding: 4.8% 7%;
+        border-right: 2px solid var(--soft);
+      }
+
+      .control:last-child {
+        border-right: 0;
+      }
+
+      .label {
+        font-size: clamp(9px, 0.72vw, 14px);
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+      }
+
+      .control strong {
+        display: block;
+        margin-top: 8px;
+        font-size: clamp(13px, 1.2vw, 22px);
+      }
+
+      .control span {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: clamp(11px, 0.95vw, 16px);
+      }
+
+      .power {
+        left: 35.2%;
+        right: 18%;
+        bottom: 5.4%;
+        min-height: 10.5%;
+        display: grid;
+        grid-template-columns: 30% 1fr;
+      }
+
+      .power-left,
+      .power-right {
+        padding: 7% 8%;
+      }
+
+      .power-left {
+        border-right: 2px solid var(--soft);
+      }
+
+      .angle {
+        margin-top: 8px;
+        font-size: clamp(28px, 2.5vw, 46px);
+        font-weight: 700;
+      }
+
+      .power-right strong {
+        display: inline-block;
+        margin-top: 8px;
+        font-size: clamp(18px, 1.7vw, 30px);
+      }
+
+      .slider {
+        margin-top: 8%;
+        height: 12px;
+        border-radius: 999px;
+        background: #e5e1da;
+        position: relative;
+      }
+
+      .slider::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 62%;
+        background: var(--accent);
+        border-radius: inherit;
+      }
+
+      .slider::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 62%;
+        width: 24px;
+        height: 24px;
+        border-radius: 999px;
+        border: 3px solid var(--accent);
+        background: #fff;
+        transform: translate(-50%, -50%);
+      }
+
+      .tagline {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 1.8%;
+        text-align: center;
+        color: var(--muted);
+        font-size: clamp(12px, 1vw, 18px);
+      }
+
+      .tagline strong {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="viewport">
+      <div class="artboard">
+        <header class="topbar">
+          <div class="brand">Regretify</div>
+          <nav class="nav">
+            <span>Calculator</span>
+            <span>Market Movement</span>
+            <span>Market Pulse</span>
+            <span>Assets</span>
+          </nav>
+          <div class="menu">Menu</div>
+        </header>
+
+        <aside class="left-copy">
+          <div class="eyebrow"></div>
+          <h2>Choose your market</h2>
+          <p>Pick a market, then take your shot to reveal the assets.</p>
+
+          <div class="market-list">
+            <article class="market-card active">
+              <div class="label">Selected</div>
+              <h3>Crypto</h3>
+              <p>High-volatility market full of opportunities.</p>
+            </article>
+            <article class="market-card">
+              <div class="label">Market</div>
+              <h3>Stocks</h3>
+              <small>Invest in companies driving the world forward.</small>
+            </article>
+            <article class="market-card">
+              <div class="label">Market</div>
+              <h3>Commodities</h3>
+              <small>Real assets with lasting value and stability.</small>
+            </article>
+            <article class="market-card">
+              <div class="label">Sponsored</div>
+              <h3>Exchange X</h3>
+              <small>Trade smarter. Faster. Zero trading fees.</small>
+            </article>
+          </div>
+        </aside>
+
+        <section class="hero-copy">
+          <h1>Take your shot</h1>
+          <p>Drag to aim</p>
+        </section>
+
+        <div class="help">?</div>
+
+        <section class="scene">
+          Character on the left, curved trajectory through the middle, and
+          target on the right.
+        </section>
+
+        <section class="controls">
+          <div class="control">
+            <div class="label">Step 01</div>
+            <strong>Drag</strong>
+            <span>to aim</span>
+          </div>
+          <div class="control">
+            <div class="label">Step 02</div>
+            <strong>Adjust Angle</strong>
+            <span>find the sweet spot</span>
+          </div>
+          <div class="control">
+            <div class="label">Step 03</div>
+            <strong>Release</strong>
+            <span>to shoot</span>
+          </div>
+          <div class="control">
+            <div class="label">Live</div>
+            <strong>Wind</strong>
+            <span>1.2 m/s</span>
+          </div>
+        </section>
+
+        <section class="power">
+          <div class="power-left">
+            <div class="label">Angle</div>
+            <div class="angle">42°</div>
+          </div>
+          <div class="power-right">
+            <div class="label">Power</div>
+            <strong>60%</strong>
+            <div class="slider"></div>
+          </div>
+        </section>
+
+        <p class="tagline">Past choices. <strong>Real lessons.</strong></p>
+      </div>
+    </div>
+  </body>
+</html>
