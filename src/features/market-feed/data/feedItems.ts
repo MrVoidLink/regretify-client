@@ -34,7 +34,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "pepe-party",
-    badge: "Meme Moment",
+    badge: "Funniest",
     title: "PEPE holders are celebrating another green day like it means destiny",
     excerpt: "The candles are up, the conviction is back, and the screenshots are flowing.",
     category: "Memes",
@@ -48,7 +48,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "sold-too-early",
-    badge: "Oops",
+    badge: "Most Talked",
     title: "\"I sold before the pump\" becomes the quote of the day again",
     excerpt: "Every cycle needs a familiar pain point and today it showed up right on time.",
     category: "Markets",
@@ -77,7 +77,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "toilet-token",
-    badge: "WTF?",
+    badge: "Weirdest",
     title: "Toilet token posts a triple-digit move and everyone pretends this is normal",
     excerpt: "Serious people are asking unserious questions and the chart is not helping.",
     category: "Crypto",
@@ -91,7 +91,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "eth-breakout",
-    badge: "Big Move",
+    badge: "Biggest Moves",
     title: "Ethereum breaks higher and brings the all-time-high takes back with it",
     excerpt: "Momentum is back, confidence is louder, and the missed-entry pain is rising.",
     category: "Crypto",
@@ -106,7 +106,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "doge-moon",
-    badge: "People",
+    badge: "Most Talked",
     title: "Dogecoin chatter returns as Elon drops another maybe-not-maybe signal",
     excerpt: "Enough ambiguity to move a timeline, not enough clarity to calm anyone down.",
     category: "People",
@@ -120,7 +120,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "shutdown-averted",
-    badge: "Macro",
+    badge: "Breaking",
     title: "Washington avoids a shutdown and markets respond with cautious relief",
     excerpt: "The panic cools off, but nobody is fully convinced this stays quiet for long.",
     category: "Macro",
@@ -134,7 +134,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "doge-meme",
-    badge: "Funny",
+    badge: "Funniest",
     title: "Not financial advice, but the meme economy is clearly doing its own thing",
     excerpt: "A joke, a pump, a screenshot, and another day of collective confusion.",
     category: "Memes",

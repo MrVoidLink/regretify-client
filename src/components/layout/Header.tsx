@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { mobileHeaderOverrides } from "@/features/calculator/data/assetSelection";
 import { getAssetSelectionAssetBySlug } from "@/features/calculator/lib/assets";
+import { productFlags } from "@/lib/productFlags";
 
 type NavItem = {
   href: string;
@@ -18,9 +19,13 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { href: "/", label: "Calculator" },
-  { href: "/market-movement", label: "Market Movement" },
-  { href: "/market-pulse", label: "Market Pulse" },
-  { href: "/assets", label: "Assets" },
+  ...(productFlags.marketPulseEnabled
+    ? [{ href: "/market-pulse", label: "Market Pulse" }]
+    : []),
+  ...(productFlags.marketMovementEnabled
+    ? [{ href: "/market-movement", label: "Market Movement" }]
+    : []),
+  ...(productFlags.assetsEnabled ? [{ href: "/assets", label: "Assets" }] : []),
 ];
 
 function isNavItemActive(pathname: string | null, href: string) {
@@ -44,6 +49,7 @@ function isNavItemActive(pathname: string | null, href: string) {
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
   const pathname = usePathname();
   const possibleAssetSlug = pathname?.startsWith("/") ? pathname.slice(1) : "";
   const isAssetCalculatorRoute =
@@ -62,6 +68,11 @@ export function Header() {
           compactBrand: true,
         }
       : null);
+  const isTransparentHeaderRoute = pathname === "/";
+  const isHeaderSolid =
+    !isTransparentHeaderRoute || hasScrolledPastHero || isMobileMenuOpen;
+  const isHeroHeaderTransparent = isTransparentHeaderRoute && !isHeaderSolid;
+  const headerTextClass = "text-zinc-950";
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -75,13 +86,44 @@ export function Header() {
     };
   }, [isMobileMenuOpen]);
 
+  useEffect(() => {
+    if (!isTransparentHeaderRoute) {
+      return;
+    }
+
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+
+    const updateHeaderSurface = () => {
+      setHasScrolledPastHero(window.scrollY > 18);
+    };
+
+    window.addEventListener("scroll", updateHeaderSurface, { passive: true });
+    const frameId = window.requestAnimationFrame(updateHeaderSurface);
+
+    return () => {
+      window.history.scrollRestoration = previousScrollRestoration;
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", updateHeaderSurface);
+    };
+  }, [isTransparentHeaderRoute]);
+
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 bg-white/82 backdrop-blur-xl px-5 py-3 sm:px-7 lg:px-10">
+      <header
+        className={`fixed inset-x-0 top-0 z-50 px-5 py-3 transition-[background-color,box-shadow,backdrop-filter] duration-300 sm:px-7 lg:px-10 ${
+          isHeroHeaderTransparent
+            ? "bg-transparent"
+            : "bg-white/82 shadow-[0_1px_0_rgba(24,24,27,0.04)] backdrop-blur-xl"
+        }`}
+      >
         <div className="mx-auto grid w-full max-w-[96rem] grid-cols-[1fr_auto_1fr] items-center">
           <Link
             href="/"
-            className={`justify-self-start text-[1.42rem] font-bold tracking-[-0.028em] text-zinc-950 md:text-[1.65rem] lg:text-[1.95rem] ${
+            className={`justify-self-start text-[1.42rem] font-bold tracking-[-0.028em] md:text-[1.65rem] lg:text-[1.95rem] ${
+              headerTextClass
+            } ${
               mobileHeaderOverride ? "hidden md:inline-block" : ""
             }`}
           >
@@ -125,7 +167,9 @@ export function Header() {
 
           <nav
             aria-label="Primary"
-            className="hidden items-center gap-6 text-[0.84rem] font-medium text-zinc-950 md:flex lg:gap-11 lg:text-[1rem]"
+            className={`hidden items-center gap-6 text-[0.84rem] font-medium md:flex lg:gap-11 lg:text-[1rem] ${
+              headerTextClass
+            }`}
           >
             {navItems.map((item) => (
               <div key={item.href} className="relative">
@@ -133,7 +177,7 @@ export function Header() {
                   href={item.href}
                   className={`whitespace-nowrap pb-2 transition-colors ${
                     isNavItemActive(pathname, item.href)
-                      ? "text-zinc-950"
+                      ? headerTextClass
                       : "text-zinc-950 hover:opacity-65"
                   }`}
                 >
@@ -152,7 +196,11 @@ export function Header() {
           <button
             type="button"
             aria-label="Open account menu"
-            className="hidden h-9 w-9 justify-self-end rounded-full border border-zinc-950/10 bg-white text-[0.82rem] font-semibold text-zinc-950 shadow-[0_8px_24px_rgba(24,24,27,0.08)] transition-opacity hover:opacity-75 md:grid md:place-items-center"
+            className={`hidden h-9 w-9 justify-self-end rounded-full text-[0.82rem] font-semibold transition-opacity hover:opacity-75 md:grid md:place-items-center ${
+              isHeroHeaderTransparent
+                ? "border border-zinc-950/10 bg-white/24 text-zinc-950 shadow-none backdrop-blur-sm"
+                : "border border-zinc-950/10 bg-white text-zinc-950 shadow-[0_8px_24px_rgba(24,24,27,0.08)]"
+            }`}
           >
             R
           </button>
@@ -162,7 +210,9 @@ export function Header() {
             aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={isMobileMenuOpen}
             onClick={() => setIsMobileMenuOpen((current) => !current)}
-            className="col-start-3 grid h-7 w-7 justify-self-end place-items-center text-zinc-950 transition-opacity hover:opacity-65 md:hidden"
+            className={`col-start-3 grid h-7 w-7 justify-self-end place-items-center transition-opacity hover:opacity-65 md:hidden ${
+              headerTextClass
+            }`}
           >
             <span className="relative block h-[13px] w-5" aria-hidden="true">
               <span

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { MarketMovementPage } from "@/features/market-movement/components/MarketMovementPage";
+import { productFlags } from "@/lib/productFlags";
 
 export const metadata: Metadata = {
   title: "Market Movement | Regretify",
@@ -8,5 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function MarketMovementRoute() {
+  if (!productFlags.marketMovementEnabled) {
+    notFound();
+  }
+
   return <MarketMovementPage />;
 }

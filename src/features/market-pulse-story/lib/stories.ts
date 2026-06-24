@@ -1,3 +1,4 @@
+import { getMarketPulseStoryPath } from "@/features/market-pulse/lib/routes";
 import { marketFeedCards } from "@/features/market-feed/data/feedItems";
 import type { MarketFeedArticleCard } from "@/features/market-feed/types";
 import type { MarketPulseStory } from "@/features/market-pulse-story/types";
@@ -50,4 +51,8 @@ export function getMarketPulseStoryParams() {
   return marketPulseStories.map((story) => ({
     slug: story.slug,
   }));
+}
+
+export function getMarketPulseStoryPathFromCard(card: MarketFeedArticleCard) {
+  return getMarketPulseStoryPath(toMarketPulseStory(card).slug);
 }

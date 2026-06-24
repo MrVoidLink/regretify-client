@@ -34,12 +34,12 @@ const relatedCalculators = [
       "bg-[linear-gradient(180deg,#dfc861_0%,#c8a233_100%)] text-white",
   },
   {
-    name: "Crypto portfolio regret",
-    ticker: "Multi-asset",
-    href: "/assets",
-    mark: "P",
+    name: "Bitcoin regret calculator",
+    ticker: "BTC",
+    href: "/bitcoin",
+    mark: "B",
     className:
-      "bg-[linear-gradient(180deg,#ffb76b_0%,#fb923c_100%)] text-white",
+      "bg-[linear-gradient(180deg,#f7b14a_0%,#f7931a_100%)] text-white",
   },
 ];
 
@@ -162,10 +162,10 @@ export function AssetCalculatorSeoSidebar({
         </div>
 
         <Link
-          href="/assets"
+          href="/asset-selection"
           className="mx-auto mt-4 flex w-fit items-center gap-1.5 text-[0.74rem] font-semibold text-[var(--color-brand)]"
         >
-          <span>View all calculators</span>
+          <span>Choose another asset</span>
           <ArrowRightIcon />
         </Link>
       </section>

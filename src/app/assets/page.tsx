@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { AssetsPage } from "@/features/assets/components/AssetsPage";
+import { productFlags } from "@/lib/productFlags";
 
 export const metadata: Metadata = {
   title: "Assets | Regretify",
@@ -8,5 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function AssetsRoute() {
+  if (!productFlags.assetsEnabled) {
+    notFound();
+  }
+
   return <AssetsPage />;
 }

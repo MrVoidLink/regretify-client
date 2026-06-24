@@ -1,4 +1,5 @@
 import { Urbanist } from "next/font/google";
+import { PlaygroundCharacterSkeletonLab } from "@/features/design-system/components/PlaygroundCharacterSkeletonLab";
 import {
   brandPalette,
   neutralPalette,
@@ -134,6 +135,7 @@ export function DesignPlaygroundPage() {
         </div>
 
         <div className="mt-6 grid gap-6">
+          <PlaygroundCharacterSkeletonLab />
           <PaletteSection
             title="Brand palette"
             eyebrow="Primary UI"

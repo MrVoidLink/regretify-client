@@ -33,9 +33,11 @@ The current priority is to rebuild the product foundation cleanly:
 - Challenge unclear product assumptions early instead of hard-coding them into the UI.
 - Do not let decorative ideas outrun the actual user flow.
 - Preserve room for future SEO, sharing, backend, and monetization work, but do not pre-build large systems for them.
+- When implementing ad or sponsor surfaces, keep the UI provider-agnostic unless a project note explicitly requires a vendor-specific integration.
 - The `/` route is the start of the main calculator experience, not a separate home feature.
 - Market selection on `/` belongs to the `calculator` feature.
 - The `/` route mini-game is an archery-style 3D interaction that leads into asset selection, not a decorative hero-only animation.
+- When a product area is parked for MVP, disable its route and remove its active navigation links without deleting the feature code.
 
 ## Code Organization
 
@@ -48,6 +50,14 @@ The current priority is to rebuild the product foundation cleanly:
 - Prefer extracting calculation, validation, formatting, and API logic out of UI components.
 - Keep API access out of JSX-heavy UI components.
 - Do not create a `home` feature for the landing route unless the product direction changes. The landing route belongs to `calculator`.
+
+## Repository Family Direction
+
+- Treat `regretify-client`, `regretify-core`, and `regretify-admin` as separate repos with separate responsibilities.
+- `regretify-core` should be implemented as a modular monolith first, not as early microservices.
+- `regretify-admin` should stay lightweight and operationally focused instead of becoming a giant generic back office.
+- When working in `regretify-core`, keep modules explicit for public API, internal/admin API, jobs, integrations, and persistence boundaries.
+- When working in `regretify-admin`, keep route files thin and prefer feature folders that mirror the operational domains: auth, assets, market-pulse, ads, sponsors, settings.
 
 ## Structure Contract
 
@@ -182,6 +192,7 @@ Apply this structure with restraint:
 - Use strong hierarchy, clear spacing, and readable copy before adding visual complexity.
 - Favor a distinct visual identity, but make sure the workflow stays obvious on first glance.
 - Every significant UI should be implemented in an SEO-friendly way, not as a visual layer that hides the page's meaning from search engines.
+- Sponsored and advertising units must read as intentional product elements, but remain clearly distinct from organic content and calculator results.
 
 ## SEO Rules
 
@@ -217,8 +228,19 @@ Apply this structure with restraint:
 - Preserve performance and Core Web Vitals while implementing rich UI.
 - When in doubt, choose the architecture that makes the page easier to crawl, understand, and canonically consolidate.
 
+## Deployment Boundary Rules
+
+- Assume Regretify MVP deployment should use private internal service communication wherever possible.
+- Do not design the database as a public internet-facing dependency.
+- Do not assume Redis, worker endpoints, or admin-to-core communication should be publicly reachable.
+- Prefer deployment shapes where frontend, core API, admin panel, workers, Redis, and PostgreSQL communicate over an internal/private network.
+- Only the intended public web surface and explicitly public API routes should sit behind public `80`/`443` entry points.
+- Keep internal/admin/operational endpoints separated from public product endpoints.
+- If a future implementation needs remote admin access, prefer an access-control layer such as VPN, tunnel, or strict allowlisting instead of broad public exposure.
+
 ## Documentation Discipline
 
 - `PROJECT.md` is the source of truth for product decisions.
 - `AGENTS.md` is the source of truth for implementation behavior inside the repo.
 - If a new decision affects both product and engineering behavior, update both files in the same task.
+- Use `src/lib/productFlags.ts` for temporary MVP route gating when a feature should stay in the repo but leave the active product surface.

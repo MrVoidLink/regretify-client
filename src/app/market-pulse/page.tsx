@@ -1,12 +1,32 @@
 import type { Metadata } from "next";
-import { MarketPulsePage } from "@/features/market-pulse/components/MarketPulsePage";
+import { MarketFeedPage } from "@/features/market-feed/components/MarketFeedPage";
+import {
+  getMarketFeedCardsThroughPage,
+  getMarketFeedTotalPages,
+  normalizeMarketFeedPage,
+} from "@/features/market-feed/lib/feedPagination";
+import { normalizeMarketFeedViewMode } from "@/features/market-feed/lib/feedQueryState";
 
 export const metadata: Metadata = {
   title: "Market Pulse | Regretify",
   description:
-    "Browse playful, curiosity-driven market stories, weird moves, and accessible explainers from Regretify.",
+    "Browse the full Market Pulse feed from Regretify, including stories, trends, and internet reactions.",
+  alternates: {
+    canonical: "/market-pulse",
+  },
 };
 
-export default function MarketPulse() {
-  return <MarketPulsePage />;
+export default async function MarketPulse(props: PageProps<"/market-pulse">) {
+  const query = await props.searchParams;
+  const initialPage = normalizeMarketFeedPage(query.page);
+  const initialViewMode = normalizeMarketFeedViewMode(query.view);
+
+  return (
+    <MarketFeedPage
+      initialCards={getMarketFeedCardsThroughPage(initialPage)}
+      initialPage={initialPage}
+      totalPages={getMarketFeedTotalPages()}
+      initialViewMode={initialViewMode}
+    />
+  );
 }

@@ -1,8 +1,10 @@
+import Link from "next/link";
 import type {
   MarketFeedCard,
   MarketFeedCardTone,
   MarketFeedViewMode,
 } from "@/features/market-feed/types";
+import { getMarketPulseStoryPathFromCard } from "@/features/market-pulse-story/lib/stories";
 
 function CommentIcon() {
   return (
@@ -72,9 +74,8 @@ function FeedStat({
 
 function SaveButton({ tone = "light" }: { tone?: "light" | "dark" }) {
   return (
-    <button
-      type="button"
-      aria-label="Save post"
+    <span
+      aria-hidden="true"
       className={`inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors ${
         tone === "dark"
           ? "border-white/18 bg-white/8 text-white/72 hover:bg-white/12 hover:text-white"
@@ -82,7 +83,7 @@ function SaveButton({ tone = "light" }: { tone?: "light" | "dark" }) {
       }`}
     >
       <SaveIcon />
-    </button>
+    </span>
   );
 }
 
@@ -210,8 +211,13 @@ export function MarketFeedCardItem({
       );
     }
 
+    const storyHref = getMarketPulseStoryPathFromCard(card);
+
     return (
-      <article className="h-full overflow-hidden rounded-[1.6rem] border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] shadow-[0_18px_42px_rgba(24,24,27,0.06)] md:grid md:grid-cols-[18rem_minmax(0,1fr)]">
+      <Link
+        href={storyHref}
+        className="block h-full overflow-hidden rounded-[1.6rem] border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] shadow-[0_18px_42px_rgba(24,24,27,0.06)] transition-transform duration-200 hover:-translate-y-0.5 md:grid md:grid-cols-[18rem_minmax(0,1fr)]"
+      >
         <FeedCardVisual card={card} />
 
         <div className="grid h-full grid-rows-[auto_1fr_auto] p-4 sm:p-5">
@@ -238,7 +244,7 @@ export function MarketFeedCardItem({
             </div>
           </div>
         </div>
-      </article>
+      </Link>
     );
   }
 
@@ -284,9 +290,14 @@ export function MarketFeedCardItem({
     );
   }
 
+  const storyHref = getMarketPulseStoryPathFromCard(card);
+
   if (featuredStyle) {
     return (
-      <article className="relative flex h-[25rem] flex-col overflow-hidden rounded-[1.6rem] border border-zinc-900/8 bg-zinc-950 shadow-[0_20px_48px_rgba(24,24,27,0.1)]">
+      <Link
+        href={storyHref}
+        className="relative flex h-[25rem] flex-col overflow-hidden rounded-[1.6rem] border border-zinc-900/8 bg-zinc-950 shadow-[0_20px_48px_rgba(24,24,27,0.1)] transition-transform duration-200 hover:-translate-y-0.5"
+      >
         <div className="absolute inset-0">
           <div className={`absolute inset-0 ${featuredSceneClassName(card.tone)}`} />
           <div className="absolute right-[-8%] top-[10%] h-40 w-40 rounded-full border border-white/12 bg-white/10 blur-[2px]" />
@@ -321,12 +332,15 @@ export function MarketFeedCardItem({
             </div>
           </div>
         </div>
-      </article>
+      </Link>
     );
   }
 
   return (
-      <article className="flex h-full flex-col overflow-hidden rounded-[1.6rem] border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] shadow-[0_18px_42px_rgba(24,24,27,0.06)]">
+      <Link
+        href={storyHref}
+        className="flex h-full flex-col overflow-hidden rounded-[1.6rem] border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] shadow-[0_18px_42px_rgba(24,24,27,0.06)] transition-transform duration-200 hover:-translate-y-0.5"
+      >
       <FeedCardVisual card={card} />
 
       <div className="grid flex-1 grid-rows-[auto_1fr_auto] p-3.5 sm:p-4">
@@ -345,6 +359,6 @@ export function MarketFeedCardItem({
           </div>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

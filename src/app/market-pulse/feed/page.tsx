@@ -6,11 +6,19 @@ import {
   normalizeMarketFeedPage,
 } from "@/features/market-feed/lib/feedPagination";
 import { normalizeMarketFeedViewMode } from "@/features/market-feed/lib/feedQueryState";
+import { marketPulsePath } from "@/features/market-pulse/lib/routes";
 
 export const metadata: Metadata = {
-  title: "Pulse Feed | Regretify",
+  title: "Pulse Feed Archive | Regretify",
   description:
-    "Browse the full Pulse Feed from Regretify's Market Pulse section, including stories, trends, and internet reactions.",
+    "Secondary Pulse Feed route for Regretify. The canonical Market Pulse feed lives on /market-pulse.",
+  alternates: {
+    canonical: marketPulsePath,
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 export default async function MarketPulseFeed(props: PageProps<"/market-pulse/feed">) {

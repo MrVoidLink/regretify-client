@@ -284,13 +284,17 @@ export function AssetCalculatorSeoMainContent({
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {["Ethereum (ETH)", "Solana (SOL)", "Dogecoin (DOGE)"].map((item) => (
+            {[
+              { label: "Ethereum (ETH)", href: "/ethereum" },
+              { label: "Solana (SOL)", href: "/solana" },
+              { label: "Dogecoin (DOGE)", href: "/dogecoin" },
+            ].map((item) => (
               <Link
-                key={item}
-                href="/assets"
+                key={item.label}
+                href={item.href}
                 className="rounded-full border border-[color:var(--color-border-ui-subtle)] bg-white px-3.5 py-2 text-[0.74rem] font-semibold text-zinc-950"
               >
-                {item}
+                {item.label}
               </Link>
             ))}
           </div>

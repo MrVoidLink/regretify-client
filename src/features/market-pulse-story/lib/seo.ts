@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getMarketPulseStoryPath } from "@/features/market-pulse/lib/routes";
+import { getMarketPulseStoryPath, marketPulsePath } from "@/features/market-pulse/lib/routes";
 import { marketPulseStoryBodyContent } from "@/features/market-pulse-story/data/storyPageBodyContent";
 import { marketPulseStoryTopContent } from "@/features/market-pulse-story/data/storyPageTopContent";
 import type { MarketPulseStory } from "@/features/market-pulse-story/types";
@@ -117,7 +117,7 @@ export function buildMarketPulseStoryJsonLd(story: MarketPulseStory) {
             "@type": "ListItem",
             position: 1,
             name: "Market Pulse",
-            item: toAbsoluteUrl("/market-pulse/feed"),
+            item: toAbsoluteUrl(marketPulsePath),
           },
           {
             "@type": "ListItem",

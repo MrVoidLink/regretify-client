@@ -88,8 +88,8 @@ As of `2026-05-23`:
   - `tip dZ`
   - `tail gap`
 - release now spawns a separate projectile arrow using sampled world position, quaternion, and scale from the hand arrow
-- the active runtime character has now changed from the old test baseline to:
-  - `public/models/playground-shooting-arrow-1k-rig.fbx`
+- the active runtime character is now:
+  - `public/models/character-512-rig-25000poly-compressed.glb`
 - the active pose sheet has been regenerated for that rig from:
   - `25 / 50 / 75 / 100`
 - release recovery now returns the character toward the `50` baseline with a dedicated blend pass instead of sharing one hard reset timing
@@ -110,7 +110,7 @@ Replace the old active mini-game character with the new lighter 1K rigged charac
 #### Test Setup
 
 - active character asset:
-  - `public/models/playground-shooting-arrow-1k-rig.fbx`
+  - `public/models/character-512-rig-25000poly-compressed.glb`
 - fallback reference character:
   - `public/models/shooting-arrow-50-trim24-skin-test.fbx`
 - active pose anchors used to rebuild runtime aim:
@@ -167,6 +167,397 @@ Replace the old active mini-game character with the new lighter 1K rigged charac
   - validation against `tail gap`, `tip dY`, and `tip dZ`
 
 ## Test Log
+
+### 2026-05-31 - Hero Background Ratio Follow-Up Note
+
+#### Objective
+
+Record the current hero-background sizing issue so a later pass can fix it deliberately instead of re-diagnosing it from scratch.
+
+#### Current Finding
+
+- the current light hero-background test assets are approximately `16:9`
+- the live `/` route hero shell is visually wider than `16:9` on desktop
+- because of that mismatch, a full-width background treatment such as:
+  - `background-size: 100% auto`
+  will still crop some vertical image area
+- the issue is not only background positioning
+- the next background regeneration pass should target a wider source ratio closer to:
+  - `2.0:1`
+  - to `2.05:1`
+- example future generation targets:
+  - `2048x1024`
+  - `2560x1280`
+  - or another width-first ratio in the same range
+
+#### Carry Forward
+
+- keep the current hero background work as a temporary visual baseline only
+- do a dedicated future pass for:
+  - wider source ratio
+  - full-width desktop fit
+  - minimal or no unintended crop inside the live hero shell
+  - re-checking floor visibility and skyline placement after the new ratio is generated
+
+### 2026-05-25 - Added Full-Draw Right Forearm Spacing Test
+
+#### Objective
+
+Test the smallest possible full-draw correction for the current hand/chest overlap without changing shoulder, upper-arm, or arrow-anchor logic.
+
+#### Test Setup
+
+- runtime component:
+  - `src/features/calculator/components/mini-game/MiniGameCharacterTestCanvas.tsx`
+- active correction scope:
+  - `mixamorigRightForeArm` only
+- activation rule:
+  - full draw / active aim only
+
+#### What Was Attempted
+
+- added a small additive local `Z` rotation correction to `mixamorigRightForeArm`
+- kept the correction disabled during draw-in and release
+- left the arrow tail anchor, right hand, shoulder, and upper arm unchanged in this pass
+
+#### Result
+
+- the live runtime now has a forearm-only spacing correction at full draw
+- the change is intentionally narrow so the current baseline can be compared against it cleanly
+
+#### Problems Found
+
+- visual approval is still pending
+- this pass may reduce chest overlap without fully solving arrow-in-hand alignment on its own
+
+#### Carry Forward
+
+- if this pass helps, tune the same forearm correction before touching broader arm-chain bones
+- if this pass is not enough, the next smallest follow-up should be `mixamorigRightHand`, not a larger shoulder rewrite
+- keep full-draw-only activation unless a later pass proves the draw phase also needs correction
+
+### 2026-05-25 - Added Bow-Space Tail And Tip Readout To Debug Overlay
+
+#### Objective
+
+Make the current arrow placement relative to the bow readable as exact numbers during tuning, especially around the approved `50` baseline.
+
+#### Test Setup
+
+- runtime component:
+  - `src/features/calculator/components/mini-game/MiniGameCharacterTestCanvas.tsx`
+- overlay values added:
+  - `tail bx / by / bz`
+  - `tip bx / by / bz`
+
+#### What Was Attempted
+
+- sampled the arrow tail and arrow tip in bow-local space during the live runtime pass
+- added those numbers to the existing top-left debug overlay
+
+#### Result
+
+- the tuning overlay now exposes exact bow-space placement values for the hand arrow
+- at `angle 50`, these values can now be read directly as the current baseline reference instead of guessed by eye
+
+#### Carry Forward
+
+- use the bow-space tail values as the first numeric reference when defining a dedicated bow-side anchor
+- keep the overlay values until the final bow anchor and seesaw-style lock relationship are approved
+
+### 2026-05-25 - Locked Tip-On-Bow Position To The Approved 50 Baseline
+
+#### Objective
+
+Keep the arrow tip in the same approved bow-space position across the live angle range instead of letting that bow contact point drift at non-50 angles.
+
+#### Test Setup
+
+- runtime component:
+  - `src/features/calculator/components/mini-game/MiniGameCharacterTestCanvas.tsx`
+- approved bow-side reference:
+  - `tip bx / by / bz` captured at full-draw `50`
+- active behavior:
+  - tail stays hand-anchored
+  - tip is re-locked to the approved bow-side point by pivot rotation
+
+#### What Was Attempted
+
+- stopped reserving the bow-tip correction only for very high angles
+- captured the approved `50` baseline tip position only at full draw
+- applied the pivot correction across the full live angle range whenever full draw is active
+
+#### Result
+
+- the approved tip-on-bow position from `50` is now the runtime reference across all active angles
+- the arrow now behaves more like a seesaw around the tail anchor instead of sliding its bow-side contact point
+
+#### Carry Forward
+
+- if the approved bow-side point changes later, update the `50` baseline and keep the same tail-pivot lock model
+- keep full-draw-only activation unless a later pass proves the draw-in phase also needs the same bow-side lock
+
+### 2026-05-25 - Reduced Projectile Launch Speed
+
+#### Objective
+
+Slow the released arrow flight so the shot reads less abrupt in the live stage while preserving the tuned target lane.
+
+#### Test Setup
+
+- runtime component:
+  - `src/features/calculator/components/mini-game/MiniGameCharacterTestCanvas.tsx`
+- tuned value:
+  - `projectileLaunchSpeed`
+- follow-up paired value:
+  - `projectileGravity`
+- unchanged for this pass:
+- hit logic
+- target placement
+
+#### What Was Attempted
+
+- reduced `projectileLaunchSpeed` from `7.25` to `5.9`
+- after the slower shot broke the previous target lane, reduced `projectileGravity` from `3.35` to `2.22`
+- kept hit logic and target placement unchanged so the lane could be recovered by projectile tuning alone
+
+#### Result
+
+- the released arrow now travels more slowly through the current stage
+- the flight arc should read more deliberately while staying much closer to the previously tuned hit path
+
+#### Carry Forward
+
+- speed and gravity now need to be treated as a paired tuning set when the goal is to keep the same target lane
+- if the shot becomes too floaty later, nudge speed and gravity together rather than changing only one of them
+
+### 2026-05-25 - Added Visible Red Halo For The Target Hit Zone
+
+#### Objective
+
+Make the active hit area on the target readable on screen with a visible red halo.
+
+#### Test Setup
+
+- runtime component:
+  - `src/features/calculator/components/mini-game/MiniGameCharacterTestCanvas.tsx`
+- halo source of truth:
+  - `targetHitRadius`
+  - `targetFrontPlaneCenter`
+- visual treatment:
+  - translucent red fill
+  - brighter red ring
+
+#### What Was Attempted
+
+- added a bow-facing red halo directly on the target front plane
+- sized the halo from the same radius used by the live hit test
+- mounted the halo inside the target group so it follows the same wobble motion after impact
+
+#### Result
+
+- the valid target collision zone is now visible as a red halo instead of needing to be inferred
+- the halo is tied to the current collision model rather than a separate decorative marker
+
+#### Carry Forward
+
+- if the collision radius changes later, keep the halo driven from the same value in the same task
+- keep the halo visually subordinate to the target art unless a stronger debug pass is needed
+
+### 2026-05-25 - Decoupled Hit Detection From Smoothed Flight Rotation
+
+#### Objective
+
+Stop visible-through-the-halo misses caused by using the smoothed visual arrow rotation for collision.
+
+#### Test Setup
+
+- runtime component:
+  - `src/features/calculator/components/mini-game/MiniGameCharacterTestCanvas.tsx`
+- visual behavior kept:
+  - smoothed projectile rotation follow
+- collision behavior changed:
+  - tip sampling now uses the direct flight-direction quaternion
+
+#### What Was Attempted
+
+- kept the visible projectile mesh using the existing smoothed rotation follow
+- changed the hit-test tip sampling to use the immediate quaternion from the current velocity vector
+- preserved the same target plane and radius logic
+
+#### Result
+
+- hit detection is now based on the true flight direction instead of the lagging display rotation
+- this should remove cases where the arrow appears to cross the visible hit halo but does not register
+
+#### Carry Forward
+
+- keep visual smoothing and collision sampling as separate concerns
+- if the projectile look is retuned later, do not route collision back through the smoothed display quaternion unless that lag is intentionally part of the hit model
+
+### 2026-05-25 - Added Predicted Impact Offset Readout
+
+#### Objective
+
+Expose the current shot's predicted miss or hit offset numerically instead of diagnosing drift only by eye.
+
+#### Test Setup
+
+- runtime component:
+  - `src/features/calculator/components/mini-game/MiniGameCharacterTestCanvas.tsx`
+- overlay values added:
+  - `hit ok`
+  - `hit dy`
+  - `hit dz`
+  - `hit r`
+
+#### What Was Attempted
+
+- simulated the current release trajectory from the live hand-arrow sample using the active speed and gravity values
+- intersected that predicted path against the same target front plane used by live collision
+- exposed the predicted center offset and radial distance in the debug overlay
+- rendered the predicted impact point directly on the target plane for faster visual diagnosis
+
+#### Result
+
+- the live overlay now shows whether the current shot should land inside the active hit zone before release
+- future drift diagnosis can now distinguish:
+  - release direction error
+  - projectile tuning error
+  - target placement error
+
+#### Carry Forward
+
+- use `hit dy`, `hit dz`, and `hit r` as the first check before moving the target or changing hit math
+- keep this readout while the release lane is still being tuned
+
+### 2026-05-25 - Retuned Target Hit Center To Match The New Release Lane
+
+#### Objective
+
+Bring the target hit zone back under the current release lane after the new hand-arrow and projectile tuning shifted the shot horizontally.
+
+#### Test Setup
+
+- runtime component:
+  - `src/features/calculator/components/mini-game/MiniGameCharacterTestCanvas.tsx`
+- diagnosis input:
+  - `hit dy`
+  - `hit dz`
+  - `hit r`
+- dominant measured miss:
+  - horizontal / target-local `z`
+
+#### What Was Attempted
+
+- replaced the older mixed world-space hit-center offset with an explicit target-local front-plane position
+- moved the hit center horizontally in target-local space to match the measured predicted impact lane
+- kept the target radius and hit math unchanged
+
+#### Result
+
+- the target hit zone is now tuned against the current release lane instead of the older pre-correction baseline
+- future target-plane retuning can now happen directly in target-local space
+
+#### Carry Forward
+
+- use target-local tuning for hit-zone placement from here forward instead of mixing world-space offsets with rotated target logic
+- if the release lane changes again, re-read `hit dz` before moving the target by eye
+
+### 2026-05-25 - Shifted The Target Mesh To The Active Hit Zone
+
+#### Objective
+
+Bring the rendered target face under the already working hit zone so the visible halo sits on the target instead of floating beside it.
+
+#### Test Setup
+
+- runtime component:
+  - `src/features/calculator/components/mini-game/MiniGameCharacterTestCanvas.tsx`
+- logic kept stable:
+  - target front plane
+  - hit radius
+  - projectile collision
+- visual alignment changed:
+  - target mesh local offset inside the target group
+
+#### What Was Attempted
+
+- kept the collision zone where the current release lane already lands
+- shifted the target mesh inside the target group toward that active hit zone
+- left the wobble group and hit math unchanged
+
+#### Result
+
+- the halo can now be visually aligned to the target face without breaking the shot lane that is already landing correctly
+- target art and target hit zone now have a cleaner path toward one shared local frame
+
+#### Carry Forward
+
+- when the target face and hit zone diverge, prefer aligning the mesh and the zone inside one shared target-local frame instead of hiding the mismatch with a detached overlay
+
+### 2026-05-25 - Preserved Incoming Flight Angle On Stuck Arrow Impact
+
+#### Objective
+
+Keep the stuck arrow on the target at the real incoming impact angle instead of flattening it to the target face.
+
+#### Test Setup
+
+- runtime component:
+  - `src/features/calculator/components/mini-game/MiniGameCharacterTestCanvas.tsx`
+- hit point kept:
+  - real target front-plane impact point
+- orientation source changed to:
+  - live projectile velocity at impact
+
+#### What Was Attempted
+
+- stopped forcing the stuck arrow direction to the target face normal
+- reused the projectile's current velocity direction at the moment of impact
+- kept the same hit point and embed-depth logic
+
+#### Result
+
+- the arrow should now stay at its incoming landing angle when it sticks into the target
+- the impact reads closer to the actual flight arc instead of snapping visually flat at contact
+
+#### Carry Forward
+
+- keep impact point accuracy and impact angle as separate concerns
+- if the embed look needs tuning later, adjust depth or offset before flattening the arrow back to the target normal
+
+### 2026-05-25 - Moved The `/` Mini-Game To Independent Lazy Loading
+
+#### Objective
+
+Stop the full `/` calculator hero from waiting on the WebGL runtime and let the 3D stage load independently inside the page shell.
+
+#### Test Setup
+
+- route shell:
+  - `src/features/calculator/components/CalculatorHomePage.tsx`
+- client island:
+  - `src/features/calculator/components/CalculatorHeroExperience.tsx`
+- lazy-loaded runtime:
+  - `src/features/calculator/components/mini-game/MiniGameCharacterTestCanvas.tsx`
+
+#### What Was Attempted
+
+- moved the outer calculator home shell back toward a server-first composition
+- isolated market selection plus stage interactivity into a dedicated client component
+- lazy-loaded the WebGL canvas with a loading state so only the stage waits on the 3D runtime
+
+#### Result
+
+- the visible `/` page shell can now render before the mini-game finishes loading
+- the red-box stage area now behaves like an independently loaded island instead of making the whole calculator hero pay the WebGL cost upfront
+
+#### Carry Forward
+
+- keep crawlable copy and non-WebGL structure outside the mini-game island
+- keep long-lived browser cache headers only on the current stable mini-game asset set
+- treat cached model and background filenames as versioned runtime assets and rename them when their contents change materially
 
 ### 2026-05-18 - Reset After First Throwaway Test
 

@@ -5,6 +5,71 @@ import type { CalculatorScenarioAsset } from "@/features/calculator/types";
 import { ArrowIcon } from "@/features/calculator/components/scenario/ArrowIcon";
 import type { CalculatorScenarioResult } from "@/features/calculator/types";
 
+function getPosterCopy(
+  asset: CalculatorScenarioAsset,
+  result: CalculatorScenarioResult,
+) {
+  if (result.tone === "profit") {
+    return {
+      chipLabel: "Missed upside",
+      chipClassName:
+        "border-emerald-200 bg-emerald-50/88 text-emerald-700",
+      chipDotClassName: "bg-emerald-500",
+      title: (
+        <>
+          I should have
+          <br />
+          bought {asset.name}
+          <br />
+          <span className="text-[var(--color-brand)]">sooner</span>
+        </>
+      ),
+      description: "That earlier entry would have looked a lot smarter today.",
+      resultLabel: "Missed profit",
+      resultValueClassName: "text-emerald-600",
+      cadenceLabels: ["Daily profit", "Monthly profit", "Yearly profit"],
+    };
+  }
+
+  if (result.tone === "loss") {
+    return {
+      chipLabel: "Bad timing",
+      chipClassName: "border-red-200 bg-red-50/88 text-red-600",
+      chipDotClassName: "bg-red-500",
+      title: (
+        <>
+          I bought
+          <br />
+          <span className="text-[var(--color-brand)]">the top</span>
+        </>
+      ),
+      description: "The entry was real. So was the damage that followed.",
+      resultLabel: "Realized loss",
+      resultValueClassName: "text-red-500",
+      cadenceLabels: ["Daily loss", "Monthly loss", "Yearly loss"],
+    };
+  }
+
+  return {
+    chipLabel: "Preview",
+    chipClassName:
+      "border-[color:var(--color-brand-border)] bg-white/78 text-[var(--color-brand)]",
+    chipDotClassName: "bg-[var(--color-brand)]",
+    title: (
+      <>
+        Your regret
+        <br />
+        poster is{" "}
+        <span className="text-[var(--color-brand)]">waiting</span>
+      </>
+    ),
+    description: "Build a scenario to reveal the result.",
+    resultLabel: "Potential result",
+    resultValueClassName: "text-[var(--color-brand)]",
+    cadenceLabels: ["Daily move", "Monthly move", "Yearly move"],
+  };
+}
+
 function PosterTemplatePreview({
   asset,
   result,
@@ -14,6 +79,7 @@ function PosterTemplatePreview({
 }) {
   const isProfit = result.tone === "profit";
   const isLoss = result.tone === "loss";
+  const posterCopy = getPosterCopy(asset, result);
 
   return (
     <div className="relative flex min-h-0 flex-1 overflow-hidden rounded-[1.05rem] bg-white p-3 text-left shadow-[inset_0_0_0_1px_rgba(111,67,255,0.14)]">
@@ -76,9 +142,13 @@ function PosterTemplatePreview({
               Regretify
             </span>
           </div>
-          <span className="inline-flex min-h-6 items-center gap-1.5 rounded-full border border-[color:var(--color-brand-border)] bg-white/78 px-2.5 text-[0.64rem] font-semibold text-[var(--color-brand)]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-brand)]" />
-            Preview
+          <span
+            className={`inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2.5 text-[0.64rem] font-semibold ${posterCopy.chipClassName}`}
+          >
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${posterCopy.chipDotClassName}`}
+            />
+            {posterCopy.chipLabel}
           </span>
         </div>
 
@@ -100,19 +170,20 @@ function PosterTemplatePreview({
 
         <div className="mt-3 min-h-0 flex-1">
           <h3 className="max-w-[17rem] text-[1.75rem] font-black leading-[0.92] tracking-[-0.08em] text-[#090926]">
-            Your regret poster is{" "}
-            <span className="text-[var(--color-brand)]">waiting</span>
+            {posterCopy.title}
           </h3>
           <p className="mt-1.5 max-w-[14rem] text-[0.68rem] leading-4.5 text-[var(--color-text-ui-soft)]">
-            Build a scenario to reveal the result.
+            {posterCopy.description}
           </p>
 
           <div className="mt-2.5 flex items-end justify-between gap-3">
             <div className="w-[9.5rem] rounded-[0.85rem] border border-white/84 bg-white/32 px-3 py-2.5 shadow-[0_12px_24px_rgba(24,24,27,0.06)] backdrop-blur-2xl">
               <p className="text-[0.58rem] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-ui-muted)]">
-                Potential result
+                {posterCopy.resultLabel}
               </p>
-              <p className="type-title mt-0.5 text-[1.45rem] font-semibold text-[var(--color-brand)]">
+              <p
+                className={`type-title mt-0.5 text-[1.45rem] font-semibold ${posterCopy.resultValueClassName}`}
+              >
                 {result.profitAmountLabel}
               </p>
             </div>
@@ -164,9 +235,9 @@ function PosterTemplatePreview({
 
         <div className="relative z-10 mt-1.5 ml-auto mr-auto grid w-[82%] grid-cols-3 rounded-[0.78rem] border border-white/80 bg-white/22 px-2 py-1.5 shadow-[0_10px_22px_rgba(24,24,27,0.06)] backdrop-blur-2xl">
           {[
-            ["Daily profit", result.dailyProfitLabel],
-            ["Monthly profit", result.monthlyProfitLabel],
-            ["Yearly profit", result.yearlyProfitLabel],
+            [posterCopy.cadenceLabels[0], result.dailyProfitLabel],
+            [posterCopy.cadenceLabels[1], result.monthlyProfitLabel],
+            [posterCopy.cadenceLabels[2], result.yearlyProfitLabel],
           ].map(([label, value], index) => (
             <div
               key={label}

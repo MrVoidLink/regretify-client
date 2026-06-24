@@ -38,10 +38,18 @@ export type MarketFeedCardTone =
 
 export type MarketFeedViewMode = "grid" | "list";
 
+export type MarketFeedArticleBadge =
+  | "Breaking"
+  | "Trending"
+  | "Most Talked"
+  | "Funniest"
+  | "Biggest Moves"
+  | "Weirdest";
+
 export type MarketFeedArticleCard = {
   kind: "article";
   id: string;
-  badge: string;
+  badge: MarketFeedArticleBadge;
   title: string;
   excerpt: string;
   category: string;

@@ -1,11 +1,12 @@
 import type { MarketMovementExploreMoreItem } from "@/features/market-movement/types";
+import { marketPulsePath } from "@/features/market-pulse/lib/routes";
 
 export const marketMovementExploreMoreItems: MarketMovementExploreMoreItem[] = [
   {
     id: "trending-stories",
     title: "Trending Stories",
     description: "See what is moving the market right now.",
-    href: "/market-pulse/feed",
+    href: marketPulsePath,
     icon: "stories",
   },
   {

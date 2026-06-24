@@ -3,7 +3,7 @@
 import {
   type KeyboardEvent,
   type PointerEvent,
-  type WheelEvent,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -55,13 +55,21 @@ function MarketChartModule({
     .map((point) => `${point.x},${point.y}`)
     .join(" ");
   const chartAreaPoints = `${chartLinePoints} 96,100 6,100`;
-  const chartMarkers = [
-    { id: "start-dot", x: startChartX, y: chartYAtX(startChartX) },
-    { id: "end-dot", x: endChartX, y: chartYAtX(endChartX) },
-  ];
   const handles = [
-    { id: "start-handle", label: "Start date position", x: startChartX, progress: safeStart },
-    { id: "end-handle", label: "End date position", x: endChartX, progress: safeEnd },
+    {
+      id: "start-handle",
+      label: "Start date position",
+      x: startChartX,
+      y: chartYAtX(startChartX),
+      progress: safeStart,
+    },
+    {
+      id: "end-handle",
+      label: "End date position",
+      x: endChartX,
+      y: chartYAtX(endChartX),
+      progress: safeEnd,
+    },
   ];
 
   function getProgressFromPointer(clientX: number) {
@@ -218,14 +226,32 @@ function MarketChartModule({
           />
         </svg>
 
-        {chartMarkers.map((marker) => (
-          <span
-            key={marker.id}
-            className="absolute z-20 grid h-4.5 w-4.5 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-[var(--color-brand)] bg-white shadow-[0_8px_18px_rgba(111,67,255,0.2)]"
-            style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
+        {handles.map((handle) => (
+          <button
+            key={`${handle.id}-chart`}
+            type="button"
+            role="slider"
+            aria-label={handle.label}
+            aria-orientation="horizontal"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(handle.progress)}
+            className="absolute z-20 grid h-7 w-7 -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none place-items-center rounded-full border-2 border-[var(--color-brand)] bg-white shadow-[0_8px_18px_rgba(111,67,255,0.2)] outline-none transition-transform focus-visible:ring-2 focus-visible:ring-[var(--color-brand)] active:scale-105 active:cursor-grabbing"
+            style={{ left: `${handle.x}%`, top: `${handle.y}%` }}
+            onPointerDown={(event) =>
+              handlePointerDown(handle.id === "start-handle" ? "start" : "end", event)
+            }
+            onPointerMove={(event) =>
+              handlePointerMove(handle.id === "start-handle" ? "start" : "end", event)
+            }
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onKeyDown={(event) =>
+              handleKeyDown(handle.id === "start-handle" ? "start" : "end", event)
+            }
           >
-            <span className="h-1.75 w-1.75 rounded-full bg-[var(--color-brand)]" />
-          </span>
+            <span className="pointer-events-none h-2.5 w-2.5 rounded-full bg-[var(--color-brand)]" />
+          </button>
         ))}
 
         <div className="absolute inset-x-9 bottom-2 flex justify-between text-[0.56rem] text-[var(--color-text-ui-muted)]">
@@ -237,7 +263,7 @@ function MarketChartModule({
 
       <div
         ref={sliderRef}
-        className="relative mt-1.5 h-[2rem] touch-none"
+        className="relative mt-1.5 h-[2rem] touch-none overflow-x-hidden overflow-y-visible"
         onPointerDown={handleSliderPointerDown}
       >
         <div className="absolute top-2.5 h-1.5 rounded-full bg-[var(--color-brand-soft-strong)]" style={{ left: `${scenarioChartPoints[0].x}%`, right: `${100 - scenarioChartPoints[scenarioChartPoints.length - 1].x}%` }} />
@@ -255,7 +281,7 @@ function MarketChartModule({
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={Math.round(handle.progress)}
-            className="absolute top-0 grid h-6 w-6 -translate-x-1/2 touch-none place-items-center rounded-full border-2 border-[var(--color-brand)] bg-white shadow-[0_10px_20px_rgba(111,67,255,0.2)] outline-none transition-transform focus-visible:ring-2 focus-visible:ring-[var(--color-brand)] active:scale-105"
+            className="absolute -top-1 grid h-8 w-8 -translate-x-1/2 cursor-grab touch-none place-items-center rounded-full border-2 border-[var(--color-brand)] bg-white shadow-[0_10px_20px_rgba(111,67,255,0.2)] outline-none transition-transform focus-visible:ring-2 focus-visible:ring-[var(--color-brand)] active:scale-105 active:cursor-grabbing"
             style={{ left: `${handle.x}%` }}
             onPointerDown={(event) =>
               handlePointerDown(handle.id === "start-handle" ? "start" : "end", event)
@@ -269,7 +295,7 @@ function MarketChartModule({
               handleKeyDown(handle.id === "start-handle" ? "start" : "end", event)
             }
           >
-            <span className="h-2 w-2 rounded-full bg-[var(--color-brand)]" />
+            <span className="pointer-events-none h-2.5 w-2.5 rounded-full bg-[var(--color-brand)]" />
           </button>
         ))}
         <div className="absolute inset-x-0 bottom-0 flex justify-between text-[0.58rem] text-[var(--color-text-ui-soft)]">
@@ -313,6 +339,9 @@ function DateWheel({
     offset,
     label: String(shiftDatePart(date, "year", offset).getFullYear()),
   }));
+  const dayWheelRef = useRef<HTMLDivElement>(null);
+  const monthWheelRef = useRef<HTMLDivElement>(null);
+  const yearWheelRef = useRef<HTMLDivElement>(null);
 
   function updateDatePart(part: DatePart, offset: number) {
     if (offset === 0) {
@@ -322,9 +351,64 @@ function DateWheel({
     onDateChange(shiftDatePart(date, part, offset));
   }
 
-  function handleWheel(part: DatePart, event: WheelEvent<HTMLDivElement>) {
-    event.preventDefault();
-    onDateChange(shiftDatePart(date, part, event.deltaY > 0 ? 1 : -1));
+  useEffect(() => {
+    const wheelBindings = [
+      { ref: dayWheelRef, part: "day" as const },
+      { ref: monthWheelRef, part: "month" as const },
+      { ref: yearWheelRef, part: "year" as const },
+    ];
+
+    const cleanups = wheelBindings
+      .map(({ ref, part }) => {
+        const element = ref.current;
+
+        if (!element) {
+          return null;
+        }
+
+        const handleWheelEvent = (event: WheelEvent) => {
+          event.preventDefault();
+          event.stopPropagation();
+          onDateChange(shiftDatePart(date, part, event.deltaY > 0 ? 1 : -1));
+        };
+
+        element.addEventListener("wheel", handleWheelEvent, { passive: false });
+
+        return () => {
+          element.removeEventListener("wheel", handleWheelEvent);
+        };
+      })
+      .filter((cleanup): cleanup is () => void => cleanup !== null);
+
+    return () => {
+      cleanups.forEach((cleanup) => cleanup());
+    };
+  }, [date, onDateChange]);
+
+  function renderWheelColumn(
+    ref: React.RefObject<HTMLDivElement | null>,
+    part: DatePart,
+    items: Array<{ id: string; offset: number; label: string }>,
+  ) {
+    return (
+      <div
+        ref={ref}
+        className="grid py-1 overscroll-contain select-none touch-none"
+      >
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => updateDatePart(part, item.offset)}
+            className={`relative z-10 grid min-h-[1rem] place-items-center ${
+              item.offset === 0 ? "font-semibold text-[var(--color-brand)]" : ""
+            }`}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+    );
   }
 
   return (
@@ -333,50 +417,11 @@ function DateWheel({
         <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-brand)]" />
         <h3 className="type-title text-[0.72rem] font-semibold text-zinc-950">{title}</h3>
       </div>
-      <div className="relative grid h-[5.55rem] grid-cols-[0.75fr_1.1fr_0.9fr] overflow-hidden rounded-[0.75rem] bg-white/30 text-center text-[0.66rem] text-[var(--color-text-ui-soft)]">
+      <div className="relative grid h-[5.55rem] grid-cols-[0.75fr_1.1fr_0.9fr] overflow-hidden rounded-[0.75rem] bg-white/30 text-center text-[0.66rem] text-[var(--color-text-ui-soft)] overscroll-contain">
         <div className="pointer-events-none absolute inset-x-0 top-1/2 h-[1.625rem] -translate-y-1/2 rounded-[0.7rem] bg-[var(--color-brand-soft)]/65 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)]" />
-        <div className="grid py-1" onWheel={(event) => handleWheel("day", event)}>
-          {dayItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => updateDatePart("day", item.offset)}
-              className={`relative z-10 grid place-items-center ${
-                item.offset === 0 ? "font-semibold text-[var(--color-brand)]" : ""
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-        <div className="grid py-1" onWheel={(event) => handleWheel("month", event)}>
-          {monthItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => updateDatePart("month", item.offset)}
-              className={`relative z-10 grid place-items-center ${
-                item.offset === 0 ? "font-semibold text-[var(--color-brand)]" : ""
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-        <div className="grid py-1" onWheel={(event) => handleWheel("year", event)}>
-          {yearItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => updateDatePart("year", item.offset)}
-              className={`relative z-10 grid place-items-center ${
-                item.offset === 0 ? "font-semibold text-[var(--color-brand)]" : ""
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+        {renderWheelColumn(dayWheelRef, "day", dayItems)}
+        {renderWheelColumn(monthWheelRef, "month", monthItems)}
+        {renderWheelColumn(yearWheelRef, "year", yearItems)}
       </div>
     </section>
   );
@@ -510,6 +555,7 @@ export function CalculatorScenarioPage({
 }: {
   asset?: CalculatorScenarioAsset;
 }) {
+  const previewPanelRef = useRef<HTMLDivElement>(null);
   const [amount, setAmount] = useState("1000");
   const [startDate, setStartDate] = useState(() => new Date(2020, 3, 12));
   const [endDate, setEndDate] = useState(() => new Date(2024, 4, 12));
@@ -539,9 +585,29 @@ export function CalculatorScenarioPage({
     setEndDate(nextDate);
   }
 
+  function scrollToPreviewPanel() {
+    if (window.matchMedia("(min-width: 1280px)").matches) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        previewPanelRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+    });
+  }
+
+  function handleCalculate() {
+    setHasCalculated(true);
+    scrollToPreviewPanel();
+  }
+
   return (
-    <main className="min-h-[calc(100dvh-4.5rem)] bg-[linear-gradient(180deg,#ffffff_0%,#faf8ff_100%)] text-zinc-950 xl:h-[calc(100dvh-4.5rem)] xl:min-h-0 xl:overflow-hidden">
-      <section className="mx-auto max-w-[96rem] px-4 pt-0 pb-6 sm:px-6 sm:pb-8 lg:px-8 lg:pb-8 xl:h-full xl:pb-4">
+    <main className="min-h-[calc(100dvh-4.5rem)] overflow-x-clip bg-[linear-gradient(180deg,#ffffff_0%,#faf8ff_100%)] text-zinc-950 xl:h-[calc(100dvh-4.5rem)] xl:min-h-0 xl:overflow-hidden">
+      <section className="mx-auto max-w-[96rem] overflow-x-clip px-4 pt-0 pb-6 sm:px-6 sm:pb-8 lg:px-8 lg:pb-8 xl:h-full xl:pb-4">
         <div className="grid gap-4 xl:h-full xl:grid-cols-[minmax(0,1fr)_30rem] xl:items-stretch">
           <div className="grid min-h-0 gap-3 xl:h-full xl:grid-rows-[auto_minmax(0,1fr)]">
             <ScenarioTopBar asset={asset} />
@@ -553,10 +619,12 @@ export function CalculatorScenarioPage({
               endDate={endDate}
               onStartDateChange={handleStartDateChange}
               onEndDateChange={handleEndDateChange}
-              onCalculate={() => setHasCalculated(true)}
+              onCalculate={handleCalculate}
             />
           </div>
-          <ScenarioPreviewPanel asset={asset} result={previewResult} />
+          <div ref={previewPanelRef} className="scroll-mt-24">
+            <ScenarioPreviewPanel asset={asset} result={previewResult} />
+          </div>
         </div>
       </section>
     </main>

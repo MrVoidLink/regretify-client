@@ -147,12 +147,14 @@ body {
   .mobile-profile-grid {
     --mobile-hero-min: 10.5rem;
     --mobile-hero-max: 3fr;
-    --mobile-market-min: 11.5rem;
-    --mobile-market-max: 2fr;
+    --mobile-market-min: 10.1rem;
+    --mobile-market-max: 1.45fr;
     --mobile-grid-gap: 0.625rem;
+    --mobile-grid-px: 0.5rem;
     --mobile-grid-py: 0.625rem;
-    --mobile-stage-shell-p: 0.625rem;
-    --mobile-market-shell-p: 0.75rem;
+    --mobile-stage-shell-px: 0.25rem;
+    --mobile-stage-shell-py: 0.625rem;
+    --mobile-market-shell-p: 0.5rem;
     --mobile-stage-copy-max: 13rem;
     --mobile-stage-copy-size: 0.84rem;
     --mobile-stage-copy-line: 1.4;
@@ -160,12 +162,16 @@ body {
     grid-template-rows: minmax(var(--mobile-hero-min), var(--mobile-hero-max))
       minmax(var(--mobile-market-min), var(--mobile-market-max));
     gap: var(--mobile-grid-gap);
+    padding-inline: var(--mobile-grid-px);
     padding-top: var(--mobile-grid-py);
     padding-bottom: var(--mobile-grid-py);
   }
 
   .mobile-stage-shell {
-    padding: var(--mobile-stage-shell-p);
+    width: calc(100% + var(--mobile-grid-px) + var(--mobile-grid-px));
+    margin-inline: calc(var(--mobile-grid-px) * -1);
+    padding-inline: var(--mobile-stage-shell-px);
+    padding-block: var(--mobile-stage-shell-py);
   }
 
   .mobile-market-shell {
@@ -184,16 +190,17 @@ body {
   }
 
   .mobile-market-layout {
-    --mobile-market-heading-size: 1.34rem;
-    --mobile-market-desc-size: 0.68rem;
-    --mobile-market-desc-max: 16rem;
+    --mobile-market-heading-size: 1.18rem;
+    --mobile-market-desc-size: 0.6rem;
+    --mobile-market-desc-max: 14rem;
     --mobile-market-card-width: 6.1rem;
-    --mobile-market-card-px: 0.58rem;
-    --mobile-market-card-py: 0.78rem;
-    --mobile-market-icon-wrap: 3.55rem;
-    --mobile-market-title-size: 0.71rem;
-    --mobile-market-text-size: 0.55rem;
-    --mobile-market-row-gap: 0.42rem;
+    --mobile-market-card-height: 11.85rem;
+    --mobile-market-card-px: 0.54rem;
+    --mobile-market-card-py: 0.62rem;
+    --mobile-market-icon-wrap: 3.1rem;
+    --mobile-market-title-size: 0.68rem;
+    --mobile-market-text-size: 0.51rem;
+    --mobile-market-row-gap: 0.32rem;
   }
 
   .mobile-market-heading {
@@ -211,6 +218,7 @@ body {
 
   .mobile-market-card {
     width: var(--mobile-market-card-width);
+    height: var(--mobile-market-card-height);
     padding-inline: var(--mobile-market-card-px);
     padding-block: var(--mobile-market-card-py);
   }
@@ -234,28 +242,31 @@ body {
   .mobile-profile-grid {
     --mobile-hero-min: 9.1rem;
     --mobile-hero-max: 11fr;
-    --mobile-market-min: 13rem;
-    --mobile-market-max: 9fr;
+    --mobile-market-min: 11.35rem;
+    --mobile-market-max: 7.25fr;
     --mobile-grid-gap: 0.5rem;
+    --mobile-grid-px: 0.4375rem;
     --mobile-grid-py: 0.5rem;
-    --mobile-stage-shell-p: 0.625rem;
-    --mobile-market-shell-p: 0.625rem;
+    --mobile-stage-shell-px: 0.1875rem;
+    --mobile-stage-shell-py: 0.625rem;
+    --mobile-market-shell-p: 0.5rem;
     --mobile-stage-copy-max: 11rem;
     --mobile-stage-copy-size: 0.8rem;
     --mobile-stage-copy-spacing: 0.5rem;
   }
 
   .mobile-market-layout {
-    --mobile-market-heading-size: 1.22rem;
-    --mobile-market-desc-size: 0.62rem;
-    --mobile-market-desc-max: 12.25rem;
+    --mobile-market-heading-size: 1.08rem;
+    --mobile-market-desc-size: 0.54rem;
+    --mobile-market-desc-max: 11.25rem;
     --mobile-market-card-width: 5.75rem;
-    --mobile-market-card-px: 0.5rem;
-    --mobile-market-card-py: 0.72rem;
-    --mobile-market-icon-wrap: 3.25rem;
-    --mobile-market-title-size: 0.66rem;
-    --mobile-market-text-size: 0.5rem;
-    --mobile-market-row-gap: 0.36rem;
+    --mobile-market-card-height: 11.2rem;
+    --mobile-market-card-px: 0.46rem;
+    --mobile-market-card-py: 0.56rem;
+    --mobile-market-icon-wrap: 2.9rem;
+    --mobile-market-title-size: 0.62rem;
+    --mobile-market-text-size: 0.45rem;
+    --mobile-market-row-gap: 0.28rem;
   }
 }
 
@@ -264,23 +275,25 @@ body {
   .mobile-profile-grid {
     --mobile-hero-min: 10rem;
     --mobile-hero-max: 3fr;
-    --mobile-market-min: 12.2rem;
-    --mobile-market-max: 2fr;
+    --mobile-market-min: 10.7rem;
+    --mobile-market-max: 1.55fr;
+    --mobile-grid-px: 0.5rem;
     --mobile-stage-copy-max: 12rem;
     --mobile-stage-copy-size: 0.82rem;
   }
 
   .mobile-market-layout {
-    --mobile-market-heading-size: 1.3rem;
-    --mobile-market-desc-size: 0.66rem;
-    --mobile-market-desc-max: 14rem;
+    --mobile-market-heading-size: 1.16rem;
+    --mobile-market-desc-size: 0.59rem;
+    --mobile-market-desc-max: 13rem;
     --mobile-market-card-width: 6rem;
-    --mobile-market-card-px: 0.56rem;
-    --mobile-market-card-py: 0.76rem;
-    --mobile-market-icon-wrap: 3.45rem;
-    --mobile-market-title-size: 0.69rem;
-    --mobile-market-text-size: 0.53rem;
-    --mobile-market-row-gap: 0.4rem;
+    --mobile-market-card-height: 11.45rem;
+    --mobile-market-card-px: 0.52rem;
+    --mobile-market-card-py: 0.6rem;
+    --mobile-market-icon-wrap: 3.02rem;
+    --mobile-market-title-size: 0.66rem;
+    --mobile-market-text-size: 0.48rem;
+    --mobile-market-row-gap: 0.3rem;
   }
 }
 
@@ -289,23 +302,25 @@ body {
   .mobile-profile-grid {
     --mobile-hero-min: 10.8rem;
     --mobile-hero-max: 11fr;
-    --mobile-market-min: 12rem;
-    --mobile-market-max: 9fr;
+    --mobile-market-min: 10.7rem;
+    --mobile-market-max: 7.1fr;
+    --mobile-grid-px: 0.5625rem;
     --mobile-stage-copy-max: 12.75rem;
     --mobile-stage-copy-size: 0.835rem;
   }
 
   .mobile-market-layout {
-    --mobile-market-heading-size: 1.36rem;
-    --mobile-market-desc-size: 0.68rem;
-    --mobile-market-desc-max: 15rem;
+    --mobile-market-heading-size: 1.18rem;
+    --mobile-market-desc-size: 0.61rem;
+    --mobile-market-desc-max: 13.75rem;
     --mobile-market-card-width: 6.22rem;
-    --mobile-market-card-px: 0.58rem;
-    --mobile-market-card-py: 0.78rem;
-    --mobile-market-icon-wrap: 3.65rem;
-    --mobile-market-title-size: 0.71rem;
-    --mobile-market-text-size: 0.55rem;
-    --mobile-market-row-gap: 0.42rem;
+    --mobile-market-card-height: 11.6rem;
+    --mobile-market-card-px: 0.54rem;
+    --mobile-market-card-py: 0.62rem;
+    --mobile-market-icon-wrap: 3.12rem;
+    --mobile-market-title-size: 0.68rem;
+    --mobile-market-text-size: 0.5rem;
+    --mobile-market-row-gap: 0.31rem;
   }
 }
 
@@ -314,23 +329,25 @@ body {
   .mobile-profile-grid {
     --mobile-hero-min: 11.25rem;
     --mobile-hero-max: 12fr;
-    --mobile-market-min: 11.8rem;
-    --mobile-market-max: 8fr;
+    --mobile-market-min: 10.55rem;
+    --mobile-market-max: 6.4fr;
+    --mobile-grid-px: 0.625rem;
     --mobile-stage-copy-max: 13.5rem;
     --mobile-stage-copy-size: 0.86rem;
   }
 
   .mobile-market-layout {
-    --mobile-market-heading-size: 1.38rem;
-    --mobile-market-desc-size: 0.69rem;
-    --mobile-market-desc-max: 15.5rem;
+    --mobile-market-heading-size: 1.2rem;
+    --mobile-market-desc-size: 0.62rem;
+    --mobile-market-desc-max: 14rem;
     --mobile-market-card-width: 6.45rem;
-    --mobile-market-card-px: 0.6rem;
-    --mobile-market-card-py: 0.8rem;
-    --mobile-market-icon-wrap: 3.85rem;
-    --mobile-market-title-size: 0.73rem;
-    --mobile-market-text-size: 0.56rem;
-    --mobile-market-row-gap: 0.44rem;
+    --mobile-market-card-height: 11.8rem;
+    --mobile-market-card-px: 0.56rem;
+    --mobile-market-card-py: 0.64rem;
+    --mobile-market-icon-wrap: 3.18rem;
+    --mobile-market-title-size: 0.69rem;
+    --mobile-market-text-size: 0.51rem;
+    --mobile-market-row-gap: 0.32rem;
   }
 }
 
@@ -339,9 +356,10 @@ body {
   .mobile-profile-grid {
     --mobile-hero-min: 9rem;
     --mobile-hero-max: 11fr;
-    --mobile-market-min: 13.2rem;
-    --mobile-market-max: 9fr;
+    --mobile-market-min: 11.4rem;
+    --mobile-market-max: 6.9fr;
     --mobile-grid-gap: 0.45rem;
+    --mobile-grid-px: 0.375rem;
     --mobile-grid-py: 0.45rem;
     --mobile-stage-copy-max: 10.5rem;
     --mobile-stage-copy-size: 0.78rem;
