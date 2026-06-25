@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   allowedDevOrigins: ["http://localhost:3000", "http://192.168.1.188:3000"],
   async headers() {
     const longLivedAssetHeaders = [
