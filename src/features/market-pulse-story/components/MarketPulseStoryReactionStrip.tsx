@@ -11,8 +11,14 @@ export function MarketPulseStoryReactionStrip({
   const [selectedReaction, setSelectedReaction] = useState(reactions[0]?.label ?? "");
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Partial<Record<string, HTMLButtonElement | null>>>({});
+  const hasMountedRef = useRef(false);
 
   useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+
     const slider = sliderRef.current;
     const card = cardRefs.current[selectedReaction];
 
