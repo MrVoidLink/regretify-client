@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { InfiniteMarketFeedGrid } from "@/features/market-feed/components/InfiniteMarketFeedGrid";
 import { marketFeedCategories } from "@/features/market-feed/data/feedItems";
 import type {
