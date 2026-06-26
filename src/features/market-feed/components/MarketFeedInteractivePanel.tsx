@@ -1,15 +1,46 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { InfiniteMarketFeedGrid } from "@/features/market-feed/components/InfiniteMarketFeedGrid";
 import { marketFeedCategories } from "@/features/market-feed/data/feedItems";
-import type { MarketFeedCard, MarketFeedCategory, MarketFeedViewMode } from "@/features/market-feed/types";
+import type {
+  MarketFeedCard,
+  MarketFeedCategory,
+  MarketFeedCategoryId,
+  MarketFeedViewMode,
+} from "@/features/market-feed/types";
 
-function CategoryChip({ category }: { category: MarketFeedCategory }) {
+function buildCategoryHref(
+  pathname: string,
+  searchParams: ReadonlyURLSearchParams,
+  categoryId: MarketFeedCategoryId,
+) {
+  const params = new URLSearchParams(searchParams.toString());
+
+  if (categoryId === "all") {
+    params.delete("category");
+  } else {
+    params.set("category", categoryId);
+  }
+
+  params.delete("page");
+
+  const nextQuery = params.toString();
+  return nextQuery ? `${pathname}?${nextQuery}` : pathname;
+}
+
+function CategoryChip({
+  category,
+  href,
+}: {
+  category: MarketFeedCategory;
+  href: string;
+}) {
   return (
-    <button
-      type="button"
+    <Link
+      href={href}
       className={`inline-flex min-h-10 items-center rounded-full px-4 text-[0.8rem] font-medium transition-colors ${
         category.isSelected
           ? "bg-[linear-gradient(180deg,var(--color-brand)_0%,var(--color-brand-strong)_100%)] text-white shadow-[0_12px_28px_rgba(90,40,223,0.22)]"
@@ -17,7 +48,7 @@ function CategoryChip({ category }: { category: MarketFeedCategory }) {
       }`}
     >
       {category.label}
-    </button>
+    </Link>
   );
 }
 
@@ -103,6 +134,7 @@ function ViewModeButton({
 
 type MarketFeedInteractivePanelProps = {
   initialCards: MarketFeedCard[];
+  initialCategory: MarketFeedCategoryId;
   initialPage: number;
   totalPages: number;
   initialViewMode: MarketFeedViewMode;
@@ -110,6 +142,7 @@ type MarketFeedInteractivePanelProps = {
 
 export function MarketFeedInteractivePanel({
   initialCards,
+  initialCategory,
   initialPage,
   totalPages,
   initialViewMode,
@@ -128,6 +161,11 @@ export function MarketFeedInteractivePanel({
 
     window.history.replaceState(window.history.state, "", nextUrl);
   }, [pathname, searchParams, viewMode]);
+
+  const categories = marketFeedCategories.map((category) => ({
+    ...category,
+    isSelected: category.id === initialCategory,
+  }));
 
   return (
     <div className="rounded-[1.8rem] border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.92)_0%,rgba(250,247,255,0.9)_100%)] p-4 shadow-[0_18px_48px_rgba(107,76,255,0.08)] backdrop-blur-sm sm:p-5 lg:rounded-[2rem] lg:p-5">
@@ -181,15 +219,21 @@ export function MarketFeedInteractivePanel({
       <div className="mt-5">
         <div className="-mx-1 w-[calc(100%+0.5rem)] overflow-x-auto px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <div className="flex w-max min-w-full gap-2">
-            {marketFeedCategories.map((category) => (
-              <CategoryChip key={category.id} category={category} />
+            {categories.map((category) => (
+              <CategoryChip
+                key={category.id}
+                category={category}
+                href={buildCategoryHref(pathname, searchParams, category.id)}
+              />
             ))}
           </div>
         </div>
       </div>
 
       <InfiniteMarketFeedGrid
+        key={`${initialCategory}:${initialPage}`}
         initialCards={initialCards}
+        category={initialCategory}
         initialPage={initialPage}
         totalPages={totalPages}
         viewMode={viewMode}

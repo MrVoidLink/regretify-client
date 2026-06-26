@@ -6,13 +6,14 @@ import type {
 } from "@/features/market-feed/types";
 
 export const marketFeedCategories: MarketFeedCategory[] = [
-  { id: "all", label: "All", isSelected: true },
+  { id: "all", label: "All" },
   { id: "crypto", label: "Crypto" },
   { id: "stocks", label: "Stocks" },
   { id: "memes", label: "Memes" },
   { id: "macro", label: "Macro" },
   { id: "people", label: "People" },
   { id: "tech", label: "Tech" },
+  { id: "defi", label: "DeFi" },
 ];
 
 const marketFeedCardSeeds: MarketFeedCard[] = [

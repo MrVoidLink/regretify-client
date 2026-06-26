@@ -7,6 +7,7 @@ import {
 } from "@/features/market-feed/data/feedItems";
 import type {
   MarketFeedCard,
+  MarketFeedCategoryId,
   MarketFeedSidebarItem,
   MarketFeedSidebarTag,
   MarketFeedViewMode,
@@ -97,6 +98,7 @@ function DesktopSidebar() {
 
 type MarketFeedPageProps = {
   initialCards: MarketFeedCard[];
+  initialCategory: MarketFeedCategoryId;
   initialPage: number;
   totalPages: number;
   initialViewMode: MarketFeedViewMode;
@@ -104,6 +106,7 @@ type MarketFeedPageProps = {
 
 export function MarketFeedPage({
   initialCards,
+  initialCategory,
   initialPage,
   totalPages,
   initialViewMode,
@@ -116,6 +119,7 @@ export function MarketFeedPage({
 
           <MarketFeedInteractivePanel
             initialCards={initialCards}
+            initialCategory={initialCategory}
             initialPage={initialPage}
             totalPages={totalPages}
             initialViewMode={initialViewMode}

@@ -5,7 +5,10 @@ import {
   getMarketFeedTotalPages,
   normalizeMarketFeedPage,
 } from "@/features/market-feed/lib/feedPagination";
-import { normalizeMarketFeedViewMode } from "@/features/market-feed/lib/feedQueryState";
+import {
+  normalizeMarketFeedCategory,
+  normalizeMarketFeedViewMode,
+} from "@/features/market-feed/lib/feedQueryState";
 
 export const metadata: Metadata = {
   title: "Market Pulse | Regretify",
@@ -18,14 +21,16 @@ export const metadata: Metadata = {
 
 export default async function MarketPulse(props: PageProps<"/market-pulse">) {
   const query = await props.searchParams;
-  const initialPage = normalizeMarketFeedPage(query.page);
+  const initialCategory = normalizeMarketFeedCategory(query.category);
+  const initialPage = normalizeMarketFeedPage(query.page, initialCategory);
   const initialViewMode = normalizeMarketFeedViewMode(query.view);
 
   return (
     <MarketFeedPage
-      initialCards={getMarketFeedCardsThroughPage(initialPage)}
+      initialCards={getMarketFeedCardsThroughPage(initialPage, initialCategory)}
+      initialCategory={initialCategory}
       initialPage={initialPage}
-      totalPages={getMarketFeedTotalPages()}
+      totalPages={getMarketFeedTotalPages(initialCategory)}
       initialViewMode={initialViewMode}
     />
   );

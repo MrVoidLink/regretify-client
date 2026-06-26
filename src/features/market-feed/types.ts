@@ -5,7 +5,8 @@ export type MarketFeedCategoryId =
   | "memes"
   | "macro"
   | "people"
-  | "tech";
+  | "tech"
+  | "defi";
 
 export type MarketFeedCategory = {
   id: MarketFeedCategoryId;

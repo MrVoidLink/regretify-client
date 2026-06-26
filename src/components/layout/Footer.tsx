@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { assetSelectionAssets } from "@/features/calculator/data/assetSelection";
+import { getAssetRoute } from "@/features/calculator/lib/assets";
+import { getMarketPulseCategoryPath } from "@/features/market-pulse/lib/routes";
 import { productFlags } from "@/lib/productFlags";
 
 const primaryLinks = [
@@ -10,11 +13,21 @@ const primaryLinks = [
     : []),
 ];
 
-const experienceNotes = [
-  "Run historical what-if scenarios in seconds.",
-  "Move from content or calculator entry straight into a regret scenario.",
-  "Share hindsight-driven results without losing the numbers.",
-];
+const marketPulseQuickLinks = [
+  "crypto",
+  "stocks",
+  "memes",
+  "macro",
+  "people",
+  "tech",
+  "defi",
+] as const;
+
+function formatQuickLinkLabel(label: (typeof marketPulseQuickLinks)[number]) {
+  return label === "defi" ? "DeFi" : `${label.charAt(0).toUpperCase()}${label.slice(1)}`;
+}
+
+const calculatorQuickAssets = assetSelectionAssets.slice(0, 8);
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -67,7 +80,7 @@ export function Footer() {
           </div>
         </section>
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,0.9fr)]">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.65fr)_minmax(0,0.8fr)_minmax(0,0.85fr)]">
           <section className="max-w-[30rem]">
             <Link
               href="/"
@@ -110,21 +123,39 @@ export function Footer() {
             ))}
           </nav>
 
-          <section>
+          <nav aria-label="Market Pulse quick access" className="grid gap-3">
             <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/46">
-              Product Angle
+              Market Pulse
             </p>
-            <ul className="mt-3 grid gap-3">
-              {experienceNotes.map((note) => (
-                <li
-                  key={note}
-                  className="rounded-[1.15rem] border border-white/8 bg-white/5 px-4 py-3 text-[0.9rem] leading-6 text-white/68"
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+              {marketPulseQuickLinks.map((category) => (
+                <Link
+                  key={category}
+                  href={getMarketPulseCategoryPath(category)}
+                  className="w-fit text-[0.95rem] text-white/76 transition-colors hover:text-white"
                 >
-                  {note}
-                </li>
+                  {formatQuickLinkLabel(category)}
+                </Link>
               ))}
-            </ul>
-          </section>
+            </div>
+          </nav>
+
+          <nav aria-label="Calculator quick access" className="grid gap-3">
+            <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/46">
+              Quick Calculate
+            </p>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+              {calculatorQuickAssets.map((asset) => (
+                <Link
+                  key={asset.ticker}
+                  href={getAssetRoute(asset)}
+                  className="w-fit text-[0.95rem] text-white/76 transition-colors hover:text-white"
+                >
+                  {asset.name}
+                </Link>
+              ))}
+            </div>
+          </nav>
         </div>
 
         <div className="flex flex-col gap-3 border-t border-white/8 pt-5 text-[0.8rem] text-white/48 sm:flex-row sm:items-center sm:justify-between">

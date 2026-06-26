@@ -4,10 +4,15 @@ import { startTransition, useEffect, useEffectEvent, useRef, useState } from "re
 import { usePathname, useSearchParams } from "next/navigation";
 import { MarketFeedCardItem } from "@/features/market-feed/components/MarketFeedCard";
 import { getMarketFeedCardsPage } from "@/features/market-feed/lib/feedPagination";
-import type { MarketFeedCard, MarketFeedViewMode } from "@/features/market-feed/types";
+import type {
+  MarketFeedCard,
+  MarketFeedCategoryId,
+  MarketFeedViewMode,
+} from "@/features/market-feed/types";
 
 type InfiniteMarketFeedGridProps = {
   initialCards: MarketFeedCard[];
+  category: MarketFeedCategoryId;
   initialPage: number;
   totalPages: number;
   viewMode: MarketFeedViewMode;
@@ -15,6 +20,7 @@ type InfiniteMarketFeedGridProps = {
 
 export function InfiniteMarketFeedGrid({
   initialCards,
+  category,
   initialPage,
   totalPages,
   viewMode,
@@ -38,7 +44,7 @@ export function InfiniteMarketFeedGrid({
     setIsLoading(true);
 
     const nextPage = loadedPage + 1;
-    const nextCards = getMarketFeedCardsPage(nextPage);
+    const nextCards = getMarketFeedCardsPage(nextPage, category);
 
     startTransition(() => {
       setVisibleCards((currentCards) => [...currentCards, ...nextCards]);
@@ -116,7 +122,11 @@ export function InfiniteMarketFeedGrid({
             {isLoading ? "Loading more stories..." : "Keep scrolling for more stories"}
           </p>
         ) : (
-          <p className="text-[0.82rem] text-zinc-400">You&apos;ve reached the end of the pulse.</p>
+          <p className="text-[0.82rem] text-zinc-400">
+            {visibleCards.length > 0
+              ? "You&apos;ve reached the end of the pulse."
+              : "No stories in this category yet."}
+          </p>
         )}
       </div>
     </>
