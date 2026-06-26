@@ -26,7 +26,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
     category: "Crypto",
     timeAgo: "2h ago",
     metrics: {
-      comments: "1.2K",
+      views: "12.4K",
       likes: "3.6K",
     },
     accent: "BTC +7.2%",
@@ -41,7 +41,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
     category: "Memes",
     timeAgo: "3h ago",
     metrics: {
-      comments: "572",
+      views: "8.9K",
       likes: "2.1K",
     },
     tone: "rose",
@@ -55,7 +55,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
     category: "Markets",
     timeAgo: "4h ago",
     metrics: {
-      comments: "456",
+      views: "6.2K",
       likes: "1.6K",
     },
     tone: "crimson",
@@ -69,7 +69,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
     category: "Stocks",
     timeAgo: "5h ago",
     metrics: {
-      comments: "321",
+      views: "5.4K",
       likes: "3.6K",
     },
     accent: "TSLA +9%",
@@ -84,7 +84,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
     category: "Crypto",
     timeAgo: "6h ago",
     metrics: {
-      comments: "689",
+      views: "7.3K",
       likes: "2.4K",
     },
     tone: "teal",
@@ -98,7 +98,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
     category: "Crypto",
     timeAgo: "7h ago",
     metrics: {
-      comments: "1.1K",
+      views: "11.8K",
       likes: "3.2K",
     },
     accent: "ETH > $3.5K",
@@ -113,7 +113,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
     category: "People",
     timeAgo: "8h ago",
     metrics: {
-      comments: "782",
+      views: "9.1K",
       likes: "2.7K",
     },
     tone: "midnight",
@@ -127,7 +127,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
     category: "Macro",
     timeAgo: "9h ago",
     metrics: {
-      comments: "214",
+      views: "4.6K",
       likes: "892",
     },
     tone: "amber",
@@ -141,7 +141,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
     category: "Memes",
     timeAgo: "10h ago",
     metrics: {
-      comments: "508",
+      views: "5.8K",
       likes: "1.7K",
     },
     tone: "crimson",
@@ -156,18 +156,18 @@ const feedTitleSuffixes = [
 ];
 
 const feedMetricOffsets = [
-  ["1.2K", "3.6K"],
-  ["572", "2.1K"],
-  ["456", "1.6K"],
-  ["321", "3.6K"],
-  ["689", "2.4K"],
-  ["1.1K", "3.2K"],
-  ["782", "2.7K"],
-  ["214", "892"],
-  ["508", "1.7K"],
+  ["12.4K", "3.6K"],
+  ["8.9K", "2.1K"],
+  ["6.2K", "1.6K"],
+  ["5.4K", "3.6K"],
+  ["7.3K", "2.4K"],
+  ["11.8K", "3.2K"],
+  ["9.1K", "2.7K"],
+  ["4.6K", "892"],
+  ["5.8K", "1.7K"],
 ];
 
-export const marketFeedCards: MarketFeedCard[] = Array.from({ length: 40 }, (_, index) => {
+export const marketFeedCards: MarketFeedCard[] = Array.from({ length: 3 }, (_, index) => {
   const seed = marketFeedCardSeeds[index % marketFeedCardSeeds.length];
   const cycle = Math.floor(index / marketFeedCardSeeds.length);
   const titleSuffix = feedTitleSuffixes[cycle] ?? "";
@@ -179,7 +179,7 @@ export const marketFeedCards: MarketFeedCard[] = Array.from({ length: 40 }, (_, 
     title: `${seed.title}${titleSuffix}`,
     timeAgo: `${2 + index}h ago`,
     metrics: {
-      comments: metricPair[0],
+      views: metricPair[0],
       likes: metricPair[1],
     },
   };
@@ -243,13 +243,13 @@ export const marketFeedEntries: MarketFeedCard[] = marketFeedCards.flatMap((card
 });
 
 export const marketFeedExploreItems: MarketFeedSidebarItem[] = [
-  { id: "all-stories", label: "All Stories", value: "40", isActive: true },
-  { id: "breaking", label: "Breaking", value: "24" },
-  { id: "trending", label: "Trending", value: "52" },
-  { id: "most-talked", label: "Most Talked", value: "78" },
-  { id: "funniest", label: "Funniest", value: "61" },
-  { id: "biggest-moves", label: "Biggest Moves", value: "37" },
-  { id: "weirdest", label: "Weirdest", value: "40" },
+  { id: "all-stories", label: "All Stories", value: "3", isActive: true },
+  { id: "breaking", label: "Breaking", value: "1" },
+  { id: "trending", label: "Trending", value: "0" },
+  { id: "most-talked", label: "Most Talked", value: "1" },
+  { id: "funniest", label: "Funniest", value: "1" },
+  { id: "biggest-moves", label: "Biggest Moves", value: "0" },
+  { id: "weirdest", label: "Weirdest", value: "0" },
 ];
 
 export const marketFeedSidebarCategories: MarketFeedSidebarItem[] = [

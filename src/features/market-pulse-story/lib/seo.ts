@@ -150,8 +150,8 @@ export function buildMarketPulseStoryJsonLd(story: MarketPulseStory) {
         interactionStatistic: [
           {
             "@type": "InteractionCounter",
-            interactionType: "https://schema.org/CommentAction",
-            userInteractionCount: parseCompactMetric(story.metrics.comments),
+            interactionType: "https://schema.org/ViewAction",
+            userInteractionCount: parseCompactMetric(story.metrics.views),
           },
           {
             "@type": "InteractionCounter",

@@ -8,7 +8,6 @@ export const marketPulseStoryTopContent: MarketPulseStoryTopContent = {
     publishedAtLabel: "May 27, 2024 · 10:42 AM",
     publishedAtIso: "2024-05-27T10:42:00Z",
   },
-  viewsLabel: "12.4K",
   sponsorCard: {
     label: "Sponsored",
     title: "Trade the moves before the crowd.",

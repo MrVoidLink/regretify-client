@@ -86,7 +86,7 @@ export function CalculatorMarketPulseRailSection() {
 
                 <div className="mt-6 flex items-center justify-between gap-3 text-[0.76rem]">
                   <div className="flex items-center gap-3 text-current/72">
-                    <span>{card.metrics.comments} comments</span>
+                    <span>{card.metrics.views} views</span>
                     <span>{card.metrics.likes} likes</span>
                   </div>
                   <span className="font-semibold text-current transition-transform group-hover:translate-x-0.5">

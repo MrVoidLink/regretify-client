@@ -22,7 +22,6 @@ export type MarketPulseStorySponsorCard = {
 
 export type MarketPulseStoryTopContent = {
   author: MarketPulseStoryAuthor;
-  viewsLabel: string;
   sponsorCard: MarketPulseStorySponsorCard;
 };
 

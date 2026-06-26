@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import type {
   MarketFeedCard,
   MarketFeedCardTone,
@@ -6,7 +9,7 @@ import type {
 } from "@/features/market-feed/types";
 import { getMarketPulseStoryPathFromCard } from "@/features/market-pulse-story/lib/stories";
 
-function CommentIcon() {
+function EyeIcon() {
   return (
     <svg
       aria-hidden="true"
@@ -18,7 +21,8 @@ function CommentIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M16 12.2a3.3 3.3 0 0 1-3.3 3.3H7.4L4 18v-2.5a3.3 3.3 0 0 1-2.3-3.1V7.3A3.3 3.3 0 0 1 5 4h7.7A3.3 3.3 0 0 1 16 7.3Z" />
+      <path d="M2.2 10s2.8-4.5 7.8-4.5 7.8 4.5 7.8 4.5-2.8 4.5-7.8 4.5S2.2 10 2.2 10Z" />
+      <circle cx="10" cy="10" r="2.1" />
     </svg>
   );
 }
@@ -29,7 +33,7 @@ function HeartIcon() {
       aria-hidden="true"
       viewBox="0 0 20 20"
       className="h-3.5 w-3.5"
-      fill="none"
+      fill="currentColor"
       stroke="currentColor"
       strokeWidth="1.7"
       strokeLinecap="round"
@@ -40,13 +44,13 @@ function HeartIcon() {
   );
 }
 
-function SaveIcon() {
+function SaveIcon({ isSaved = false }: { isSaved?: boolean }) {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 20 20"
       className="h-3.5 w-3.5"
-      fill="none"
+      fill={isSaved ? "currentColor" : "none"}
       stroke="currentColor"
       strokeWidth="1.7"
       strokeLinecap="round"
@@ -57,33 +61,83 @@ function SaveIcon() {
   );
 }
 
-function FeedStat({
-  icon,
-  value,
-}: {
-  icon: "comments" | "likes";
-  value: string;
-}) {
+function FeedStat({ value }: { value: string }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      {icon === "comments" ? <CommentIcon /> : <HeartIcon />}
+      <EyeIcon />
       <span>{value}</span>
     </span>
   );
 }
 
-function SaveButton({ tone = "light" }: { tone?: "light" | "dark" }) {
+function LikeButton({
+  value,
+  tone = "light",
+}: {
+  value: string;
+  tone?: "light" | "dark";
+}) {
+  const [isLiked, setIsLiked] = useState(false);
+
+  function toggleLikedState(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsLiked((current) => !current);
+  }
+
   return (
-    <span
-      aria-hidden="true"
-      className={`inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors ${
+    <button
+      type="button"
+      aria-label={isLiked ? "Unlike story" : "Like story"}
+      aria-pressed={isLiked}
+      onClick={toggleLikedState}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-colors ${
         tone === "dark"
-          ? "border-white/18 bg-white/8 text-white/72 hover:bg-white/12 hover:text-white"
-          : "border-[color:var(--color-border-ui-subtle)] text-[var(--color-text-ui-muted)] hover:bg-[var(--color-brand-soft)] hover:text-zinc-800"
+          ? isLiked
+            ? "border-rose-300/60 bg-rose-500/18 text-rose-200"
+            : "border-white/10 bg-white/6 text-white/76 hover:border-white/18 hover:bg-white/10 hover:text-white"
+          : isLiked
+            ? "border-rose-200 bg-rose-50 text-rose-600"
+            : "border-[color:var(--color-border-ui-subtle)] text-[var(--color-text-ui-muted)] hover:bg-rose-50 hover:text-rose-500"
       }`}
     >
-      <SaveIcon />
-    </span>
+      <HeartIcon />
+      <span>{value}</span>
+    </button>
+  );
+}
+
+function SaveButton({
+  tone = "light",
+}: {
+  tone?: "light" | "dark";
+}) {
+  const [isSaved, setIsSaved] = useState(false);
+
+  function toggleSavedState(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsSaved((current) => !current);
+  }
+
+  return (
+    <button
+      type="button"
+      aria-label={isSaved ? "Remove saved story" : "Save story"}
+      aria-pressed={isSaved}
+      onClick={toggleSavedState}
+      className={`inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors ${
+        tone === "dark"
+          ? isSaved
+            ? "border-white/28 bg-white/22 text-white"
+            : "border-white/18 bg-white/8 text-white/72 hover:bg-white/12 hover:text-white"
+          : isSaved
+            ? "border-[color:var(--color-brand-border)] bg-[linear-gradient(180deg,var(--color-brand-soft)_0%,var(--color-brand-soft-strong)_100%)] text-[var(--color-brand-strong)]"
+            : "border-[color:var(--color-border-ui-subtle)] text-[var(--color-text-ui-muted)] hover:bg-[var(--color-brand-soft)] hover:text-zinc-800"
+      }`}
+    >
+      <SaveIcon isSaved={isSaved} />
+    </button>
   );
 }
 
@@ -238,8 +292,8 @@ export function MarketFeedCardItem({
           <div className="flex items-center justify-between gap-3 pt-5 text-[0.78rem] text-[var(--color-text-ui-muted)]">
             <span>{card.badge}</span>
             <div className="flex items-center gap-3">
-              <FeedStat icon="comments" value={card.metrics.comments} />
-              <FeedStat icon="likes" value={card.metrics.likes} />
+              <FeedStat value={card.metrics.views} />
+              <LikeButton value={card.metrics.likes} />
               <SaveButton />
             </div>
           </div>
@@ -325,8 +379,8 @@ export function MarketFeedCardItem({
             <div className="mt-4 flex items-center justify-between gap-3 text-[0.76rem] text-white/76">
               <span>{card.category}</span>
               <div className="flex items-center gap-3 text-white/82">
-                <FeedStat icon="comments" value={card.metrics.comments} />
-                <FeedStat icon="likes" value={card.metrics.likes} />
+                <FeedStat value={card.metrics.views} />
+                <LikeButton value={card.metrics.likes} tone="dark" />
                 <SaveButton tone="dark" />
               </div>
             </div>
@@ -353,8 +407,8 @@ export function MarketFeedCardItem({
         <div className="flex items-center justify-between gap-3 pt-3.5 text-[0.74rem] text-[var(--color-text-ui-muted)]">
           <span>{card.category}</span>
           <div className="flex items-center gap-3">
-            <FeedStat icon="comments" value={card.metrics.comments} />
-            <FeedStat icon="likes" value={card.metrics.likes} />
+            <FeedStat value={card.metrics.views} />
+            <LikeButton value={card.metrics.likes} />
             <SaveButton />
           </div>
         </div>

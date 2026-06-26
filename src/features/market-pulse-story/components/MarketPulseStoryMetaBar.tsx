@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 import type { MarketPulseStory, MarketPulseStoryAuthor } from "@/features/market-pulse-story/types";
 
 function EyeIcon() {
@@ -25,13 +28,30 @@ function LikeIcon() {
       aria-hidden="true"
       viewBox="0 0 20 20"
       className="h-4 w-4"
-      fill="none"
+      fill="currentColor"
       stroke="currentColor"
       strokeWidth="1.7"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
       <path d="M10 16.4 3.9 10.7a3.9 3.9 0 0 1 5.5-5.6L10 5.7l.6-.6a3.9 3.9 0 0 1 5.5 5.6Z" />
+    </svg>
+  );
+}
+
+function SaveIcon({ isSaved = false }: { isSaved?: boolean }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 20 20"
+      className="h-4 w-4"
+      fill={isSaved ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5.5 3.5h9v13l-4.5-2.8-4.5 2.8Z" />
     </svg>
   );
 }
@@ -61,29 +81,62 @@ function VerifiedDot() {
   return <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-brand)]" aria-hidden="true" />;
 }
 
-function StoryMetric({
-  icon,
-  label,
-}: {
-  icon: "views" | "likes";
-  label: string;
-}) {
+function StoryMetric({ label }: { label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-[0.84rem] text-[var(--color-text-ui-muted)]">
-      {icon === "views" ? <EyeIcon /> : <LikeIcon />}
+      <EyeIcon />
       <span>{label}</span>
     </span>
+  );
+}
+
+function StoryLikeButton({ label }: { label: string }) {
+  const [isLiked, setIsLiked] = useState(false);
+
+  return (
+    <button
+      type="button"
+      aria-label={isLiked ? "Unlike story" : "Like story"}
+      aria-pressed={isLiked}
+      onClick={() => setIsLiked((current) => !current)}
+      className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-[0.84rem] font-medium transition-colors ${
+        isLiked
+          ? "border-rose-200 bg-rose-50 text-rose-600"
+          : "border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] text-[var(--color-text-ui-soft)] hover:bg-rose-50 hover:text-rose-500"
+      }`}
+    >
+      <LikeIcon />
+      <span>{label}</span>
+    </button>
+  );
+}
+
+function StorySaveButton() {
+  const [isSaved, setIsSaved] = useState(false);
+
+  return (
+    <button
+      type="button"
+      aria-label={isSaved ? "Remove saved story" : "Save story"}
+      aria-pressed={isSaved}
+      onClick={() => setIsSaved((current) => !current)}
+      className={`inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors ${
+        isSaved
+          ? "border-[color:var(--color-brand-border)] bg-[linear-gradient(180deg,var(--color-brand-soft)_0%,var(--color-brand-soft-strong)_100%)] text-[var(--color-brand-strong)]"
+          : "border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] text-[var(--color-text-ui-soft)] hover:bg-[var(--color-brand-soft)]"
+      }`}
+    >
+      <SaveIcon isSaved={isSaved} />
+    </button>
   );
 }
 
 export function MarketPulseStoryMetaBar({
   author,
   story,
-  viewsLabel,
 }: {
   author: MarketPulseStoryAuthor;
   story: MarketPulseStory;
-  viewsLabel: string;
 }) {
   return (
     <section className="rounded-b-[2rem] border border-t-0 border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] px-5 py-4 shadow-[0_16px_40px_rgba(24,24,27,0.06)] sm:px-7 lg:px-8">
@@ -119,8 +172,9 @@ export function MarketPulseStoryMetaBar({
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
-          <StoryMetric icon="views" label={`${viewsLabel} views`} />
-          <StoryMetric icon="likes" label={story.metrics.likes} />
+          <StoryMetric label={`${story.metrics.views} views`} />
+          <StoryLikeButton label={story.metrics.likes} />
+          <StorySaveButton />
           <button
             type="button"
             className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] px-4 text-[0.85rem] font-medium text-[var(--color-text-ui-soft)] shadow-[0_8px_20px_rgba(24,24,27,0.04)] transition-colors hover:bg-[var(--color-brand-soft)]"

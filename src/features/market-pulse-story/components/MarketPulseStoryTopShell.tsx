@@ -41,7 +41,6 @@ export function MarketPulseStoryTopShell({ story }: { story: MarketPulseStory })
           <MarketPulseStoryMetaBar
             author={marketPulseStoryTopContent.author}
             story={story}
-            viewsLabel={marketPulseStoryTopContent.viewsLabel}
           />
         </div>
 
