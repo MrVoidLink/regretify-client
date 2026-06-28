@@ -187,6 +187,7 @@ export function toMarketFeedArticleCard(
     excerpt: post.excerpt,
     category: normalizeCategoryLabel(post.category),
     timeAgo: formatRelativePublishedAt(post.publishedAt),
+    feedHeroImageSrc: toAbsoluteAssetUrl(post.feedHeroAssetKey),
     metrics: {
       views: formatCompactMetric(post.viewsCount),
       likes: formatCompactMetric(post.likesCount),

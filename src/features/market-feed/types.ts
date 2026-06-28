@@ -56,6 +56,7 @@ export type MarketFeedArticleCard = {
   excerpt: string;
   category: string;
   timeAgo: string;
+  feedHeroImageSrc?: string | null;
   metrics: {
     views: string;
     likes: string;

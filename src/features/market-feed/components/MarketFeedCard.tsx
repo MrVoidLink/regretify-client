@@ -189,9 +189,18 @@ function featuredSceneClassName(tone: MarketFeedCardTone) {
 
 function FeedCardVisual({ card }: { card: MarketFeedCard }) {
   const toneClassName = cardToneClassName(card.tone);
+  const articleHeroImageSrc =
+    card.kind === "article" ? card.feedHeroImageSrc?.trim() : null;
 
   return (
     <div className={`relative h-[13.5rem] overflow-hidden ${toneClassName}`}>
+      {articleHeroImageSrc ? (
+        <img
+          src={articleHeroImageSrc}
+          alt={`${card.title} feed artwork`}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : null}
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,10,18,0.04)_0%,rgba(8,10,18,0.18)_48%,rgba(8,10,18,0.48)_100%)]" />
       <div
         className={`absolute left-4 top-4 rounded-full px-2.5 py-1 text-[0.62rem] font-semibold tracking-[0.1em] text-white uppercase ${
@@ -347,13 +356,23 @@ export function MarketFeedCardItem({
   const storyHref = getMarketPulseStoryPath(card.slug);
 
   if (featuredStyle) {
+    const articleHeroImageSrc = card.feedHeroImageSrc?.trim();
+
     return (
       <Link
         href={storyHref}
         className="relative flex h-[25rem] flex-col overflow-hidden rounded-[1.6rem] border border-zinc-900/8 bg-zinc-950 shadow-[0_20px_48px_rgba(24,24,27,0.1)] transition-transform duration-200 hover:-translate-y-0.5"
       >
         <div className="absolute inset-0">
-          <div className={`absolute inset-0 ${featuredSceneClassName(card.tone)}`} />
+          {articleHeroImageSrc ? (
+            <img
+              src={articleHeroImageSrc}
+              alt={`${card.title} feed artwork`}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : (
+            <div className={`absolute inset-0 ${featuredSceneClassName(card.tone)}`} />
+          )}
           <div className="absolute right-[-8%] top-[10%] h-40 w-40 rounded-full border border-white/12 bg-white/10 blur-[2px]" />
           <div className="absolute left-[8%] top-[28%] h-28 w-28 rounded-full bg-white/10 blur-2xl" />
           <div className="absolute right-[10%] top-[22%] h-2 w-2 rounded-full bg-white/80" />
