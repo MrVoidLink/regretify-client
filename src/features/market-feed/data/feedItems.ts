@@ -1,5 +1,6 @@
 import type {
   MarketFeedCard,
+  MarketFeedArticleCard,
   MarketFeedCategory,
   MarketFeedSidebarItem,
   MarketFeedSidebarTag,
@@ -16,10 +17,11 @@ export const marketFeedCategories: MarketFeedCategory[] = [
   { id: "defi", label: "DeFi" },
 ];
 
-const marketFeedCardSeeds: MarketFeedCard[] = [
+const marketFeedCardSeeds: MarketFeedArticleCard[] = [
   {
     kind: "article",
     id: "bitcoin-whale",
+    slug: "bitcoin-whale",
     badge: "Breaking",
     title: "Bitcoin jumps after mysterious whale chatter hits the timeline",
     excerpt: "One big wallet, one loud rumor, and the entire feed forgets how to act.",
@@ -35,6 +37,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "pepe-party",
+    slug: "pepe-party",
     badge: "Funniest",
     title: "PEPE holders are celebrating another green day like it means destiny",
     excerpt: "The candles are up, the conviction is back, and the screenshots are flowing.",
@@ -49,6 +52,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "sold-too-early",
+    slug: "sold-too-early",
     badge: "Most Talked",
     title: "\"I sold before the pump\" becomes the quote of the day again",
     excerpt: "Every cycle needs a familiar pain point and today it showed up right on time.",
@@ -63,6 +67,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "tesla-bio",
+    slug: "tesla-bio",
     badge: "Trending",
     title: "Tesla pops after another Elon profile tweak gets over-interpreted",
     excerpt: "A tiny social move, a giant reaction, and a very online market does the rest.",
@@ -78,6 +83,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "toilet-token",
+    slug: "toilet-token",
     badge: "Weirdest",
     title: "Toilet token posts a triple-digit move and everyone pretends this is normal",
     excerpt: "Serious people are asking unserious questions and the chart is not helping.",
@@ -92,6 +98,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "eth-breakout",
+    slug: "eth-breakout",
     badge: "Biggest Moves",
     title: "Ethereum breaks higher and brings the all-time-high takes back with it",
     excerpt: "Momentum is back, confidence is louder, and the missed-entry pain is rising.",
@@ -107,6 +114,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "doge-moon",
+    slug: "doge-moon",
     badge: "Most Talked",
     title: "Dogecoin chatter returns as Elon drops another maybe-not-maybe signal",
     excerpt: "Enough ambiguity to move a timeline, not enough clarity to calm anyone down.",
@@ -121,6 +129,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "shutdown-averted",
+    slug: "shutdown-averted",
     badge: "Breaking",
     title: "Washington avoids a shutdown and markets respond with cautious relief",
     excerpt: "The panic cools off, but nobody is fully convinced this stays quiet for long.",
@@ -135,6 +144,7 @@ const marketFeedCardSeeds: MarketFeedCard[] = [
   {
     kind: "article",
     id: "doge-meme",
+    slug: "doge-meme",
     badge: "Funniest",
     title: "Not financial advice, but the meme economy is clearly doing its own thing",
     excerpt: "A joke, a pump, a screenshot, and another day of collective confusion.",
@@ -176,6 +186,7 @@ export const marketFeedCards: MarketFeedCard[] = Array.from({ length: 3 }, (_, i
   return {
     ...seed,
     id: `${seed.id}-${index + 1}`,
+    slug: `${seed.slug}-${index + 1}`,
     title: `${seed.title}${titleSuffix}`,
     timeAgo: `${2 + index}h ago`,
     metrics: {

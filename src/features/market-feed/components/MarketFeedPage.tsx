@@ -1,9 +1,7 @@
 import { MarketFeedInteractivePanel } from "@/features/market-feed/components/MarketFeedInteractivePanel";
 import { ScrollToTopButton } from "@/features/market-feed/components/ScrollToTopButton";
 import {
-  marketFeedExploreItems,
   marketFeedPopularTags,
-  marketFeedSidebarCategories,
 } from "@/features/market-feed/data/feedItems";
 import type {
   MarketFeedCard,
@@ -12,6 +10,17 @@ import type {
   MarketFeedSidebarTag,
   MarketFeedViewMode,
 } from "@/features/market-feed/types";
+import type { MarketPulseFeedResponse } from "@/features/market-pulse/lib/publicApi";
+
+const sidebarCategoryLabels: Array<{ id: string; label: string }> = [
+  { id: "crypto", label: "Crypto" },
+  { id: "stocks", label: "Stocks" },
+  { id: "memes", label: "Memes" },
+  { id: "macro", label: "Macro" },
+  { id: "people", label: "People" },
+  { id: "tech", label: "Tech" },
+  { id: "defi", label: "DeFi" },
+];
 
 function SidebarSectionTitle({ children }: { children: React.ReactNode }) {
   return <h2 className="type-title text-[0.8rem] font-semibold text-zinc-950">{children}</h2>;
@@ -44,7 +53,22 @@ function SidebarTag({ tag }: { tag: MarketFeedSidebarTag }) {
   );
 }
 
-function DesktopSidebar() {
+function DesktopSidebar({ summary }: { summary: MarketPulseFeedResponse["summary"] }) {
+  const exploreItems: MarketFeedSidebarItem[] = [
+    { id: "all-stories", label: "All Stories", value: String(summary.total), isActive: true },
+    { id: "breaking", label: "Breaking", value: String(summary.byBadge.Breaking ?? 0) },
+    { id: "trending", label: "Trending", value: String(summary.byBadge.Trending ?? 0) },
+    { id: "most-talked", label: "Most Talked", value: String(summary.byBadge["Most Talked"] ?? 0) },
+    { id: "funniest", label: "Funniest", value: String(summary.byBadge.Funniest ?? 0) },
+    { id: "biggest-moves", label: "Biggest Moves", value: String(summary.byBadge["Biggest Moves"] ?? 0) },
+    { id: "weirdest", label: "Weirdest", value: String(summary.byBadge.Weirdest ?? 0) },
+  ];
+  const sidebarCategories: MarketFeedSidebarItem[] = sidebarCategoryLabels.map((category) => ({
+    id: category.id,
+    label: category.label,
+    value: String(summary.byCategory[category.label] ?? 0),
+  }));
+
   return (
     <aside className="hidden self-start xl:block">
       <div className="xl:fixed xl:top-24 xl:left-[max(2rem,calc((100vw-96rem)/2+2rem))] xl:w-[15.5rem]">
@@ -67,7 +91,7 @@ function DesktopSidebar() {
           <section className="rounded-[1.1rem] border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] p-2.75 shadow-[0_14px_32px_rgba(24,24,27,0.04)]">
             <SidebarSectionTitle>Explore</SidebarSectionTitle>
             <div className="mt-1.75 space-y-0">
-              {marketFeedExploreItems.map((item) => (
+              {exploreItems.map((item) => (
                 <SidebarListItem key={item.id} item={item} />
               ))}
             </div>
@@ -76,7 +100,7 @@ function DesktopSidebar() {
           <section className="rounded-[1.1rem] border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] p-2.75 shadow-[0_14px_32px_rgba(24,24,27,0.04)]">
             <SidebarSectionTitle>Categories</SidebarSectionTitle>
             <div className="mt-1.75 space-y-0">
-              {marketFeedSidebarCategories.map((item) => (
+              {sidebarCategories.map((item) => (
                 <SidebarListItem key={item.id} item={item} />
               ))}
             </div>
@@ -102,6 +126,7 @@ type MarketFeedPageProps = {
   initialPage: number;
   totalPages: number;
   initialViewMode: MarketFeedViewMode;
+  summary: MarketPulseFeedResponse["summary"];
 };
 
 export function MarketFeedPage({
@@ -110,12 +135,13 @@ export function MarketFeedPage({
   initialPage,
   totalPages,
   initialViewMode,
+  summary,
 }: MarketFeedPageProps) {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#faf7ff_0%,#ffffff_18%,#ffffff_100%)] text-zinc-950">
       <section className="mx-auto max-w-[96rem] px-4 pt-2 pb-7 sm:px-7 sm:pt-3 sm:pb-8 lg:px-8 lg:pt-3 lg:pb-10">
         <div className="xl:grid xl:grid-cols-[15.5rem_minmax(0,1fr)] xl:items-start xl:gap-6">
-          <DesktopSidebar />
+          <DesktopSidebar summary={summary} />
 
           <MarketFeedInteractivePanel
             initialCards={initialCards}
@@ -123,6 +149,7 @@ export function MarketFeedPage({
             initialPage={initialPage}
             totalPages={totalPages}
             initialViewMode={initialViewMode}
+            summary={summary}
           />
         </div>
       </section>

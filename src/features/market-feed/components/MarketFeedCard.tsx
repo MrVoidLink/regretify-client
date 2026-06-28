@@ -7,7 +7,7 @@ import type {
   MarketFeedCardTone,
   MarketFeedViewMode,
 } from "@/features/market-feed/types";
-import { getMarketPulseStoryPathFromCard } from "@/features/market-pulse-story/lib/stories";
+import { getMarketPulseStoryPath } from "@/features/market-pulse/lib/routes";
 
 function EyeIcon() {
   return (
@@ -265,7 +265,7 @@ export function MarketFeedCardItem({
       );
     }
 
-    const storyHref = getMarketPulseStoryPathFromCard(card);
+    const storyHref = getMarketPulseStoryPath(card.slug);
 
     return (
       <Link
@@ -344,7 +344,7 @@ export function MarketFeedCardItem({
     );
   }
 
-  const storyHref = getMarketPulseStoryPathFromCard(card);
+  const storyHref = getMarketPulseStoryPath(card.slug);
 
   if (featuredStyle) {
     return (

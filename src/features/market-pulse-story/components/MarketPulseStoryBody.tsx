@@ -1,12 +1,27 @@
 import Link from "next/link";
-import {
-  getMarketPulseStoryPath,
-  marketPulseFeedPath,
-} from "@/features/market-pulse/lib/routes";
+import { getMarketPulseStoryPath, marketPulseFeedPath } from "@/features/market-pulse/lib/routes";
 import { MarketPulseStoryReactionStrip } from "@/features/market-pulse-story/components/MarketPulseStoryReactionStrip";
-import { marketPulseStoryBodyContent } from "@/features/market-pulse-story/data/storyPageBodyContent";
-import { getMarketPulseStories } from "@/features/market-pulse-story/lib/stories";
+import { decorateBodyHtmlWithHeadingIds, extractOutlineLinksFromBodyHtml } from "@/features/market-pulse-story/lib/bodyHtml";
+import type { MarketFeedArticleCard } from "@/features/market-feed/types";
 import type { MarketPulseStory } from "@/features/market-pulse-story/types";
+
+const storyReactionContent = {
+  heading: "How are you feeling about this?",
+  reactions: [
+    { emoji: "🚀", label: "Bullish", countLabel: "1.2K" },
+    { emoji: "😱", label: "Shocked", countLabel: "892" },
+    { emoji: "😂", label: "Hilarious", countLabel: "602" },
+    { emoji: "😡", label: "Angry", countLabel: "210" },
+    { emoji: "🤔", label: "Hmm", countLabel: "345" },
+  ],
+};
+
+const storyCtaContent = {
+  title: "What if you invested before the pump?",
+  description:
+    "See how much that missed move would be worth now and how much regret it should probably cause.",
+  buttonLabel: "Calculate Your Regret",
+};
 
 function ArrowLeftIcon() {
   return (
@@ -44,7 +59,7 @@ function ArrowRightIcon() {
   );
 }
 
-function storyThumbToneClassName(story: MarketPulseStory) {
+function storyThumbToneClassName(story: MarketFeedArticleCard) {
   switch (story.tone) {
     case "midnight":
       return "bg-[radial-gradient(circle_at_top_left,#6d54ff_0%,#2a1e64_42%,#101320_100%)]";
@@ -77,15 +92,8 @@ function parseCompactMetric(value: string) {
   return Number.parseFloat(normalized.replace(/,/g, "")) || 0;
 }
 
-function StoryOutlineCard() {
-  const { breakdown, analysis, takeaways } = marketPulseStoryBodyContent;
-
-  const links = [
-    { href: "#story-overview", label: "Market overview" },
-    { href: "#story-breakdown", label: breakdown.heading },
-    { href: "#story-analysis-detail", label: analysis.heading },
-    { href: "#story-key-points", label: takeaways.heading },
-  ];
+function StoryOutlineCard({ bodyHtml }: { bodyHtml: string }) {
+  const links = extractOutlineLinksFromBodyHtml(bodyHtml);
 
   return (
     <nav
@@ -111,15 +119,8 @@ function StoryOutlineCard() {
   );
 }
 
-function MobileStoryOutlineCard() {
-  const { breakdown, analysis, takeaways } = marketPulseStoryBodyContent;
-
-  const links = [
-    { href: "#story-overview", label: "Market overview" },
-    { href: "#story-breakdown", label: breakdown.heading },
-    { href: "#story-analysis-detail", label: analysis.heading },
-    { href: "#story-key-points", label: takeaways.heading },
-  ];
+function MobileStoryOutlineCard({ bodyHtml }: { bodyHtml: string }) {
+  const links = extractOutlineLinksFromBodyHtml(bodyHtml);
 
   return (
     <section className="rounded-[1.2rem] border border-[color:var(--color-border-ui-subtle)] bg-[var(--color-surface-ui-muted)] px-4 py-4 xl:hidden">
@@ -139,8 +140,10 @@ function MobileStoryOutlineCard() {
   );
 }
 
-function StoryTagList() {
-  const { tags } = marketPulseStoryBodyContent;
+function StoryTagList({ tags }: { tags: string[] }) {
+  if (!tags.length) {
+    return null;
+  }
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -157,27 +160,34 @@ function StoryTagList() {
 }
 
 function StoryReactionGrid() {
-  const { reactionsHeading, reactions } = marketPulseStoryBodyContent;
-
   return (
     <section
       aria-labelledby="story-reactions-heading"
       className="border-t border-[color:var(--color-border-ui-subtle)] pt-8"
     >
       <h2 id="story-reactions-heading" className="type-title text-[1.28rem] font-semibold text-zinc-950">
-        {reactionsHeading}
+        {storyReactionContent.heading}
       </h2>
-      <MarketPulseStoryReactionStrip reactions={reactions} />
+      <MarketPulseStoryReactionStrip reactions={storyReactionContent.reactions} />
     </section>
   );
 }
 
-function StoryPagination({ story }: { story: MarketPulseStory }) {
-  const stories = getMarketPulseStories();
-  const currentIndex = stories.findIndex((item) => item.slug === story.slug);
-  const previousStory = currentIndex > 0 ? stories[currentIndex - 1] : null;
+function StoryPagination({
+  story,
+  feedStories,
+}: {
+  story: MarketPulseStory;
+  feedStories: MarketFeedArticleCard[];
+}) {
+  const currentIndex = feedStories.findIndex((item) => item.slug === story.slug);
+  const previousStory = currentIndex > 0 ? feedStories[currentIndex - 1] : null;
   const nextStory =
-    currentIndex >= 0 && currentIndex < stories.length - 1 ? stories[currentIndex + 1] : null;
+    currentIndex >= 0 && currentIndex < feedStories.length - 1 ? feedStories[currentIndex + 1] : null;
+
+  if (!previousStory && !nextStory) {
+    return null;
+  }
 
   return (
     <nav aria-label="Story navigation" className="border-t border-[color:var(--color-border-ui-subtle)] pt-7">
@@ -210,7 +220,7 @@ function StoryPagination({ story }: { story: MarketPulseStory }) {
   );
 }
 
-function RelatedPulseCard({ story }: { story: MarketPulseStory }) {
+function RelatedPulseCard({ story }: { story: MarketFeedArticleCard }) {
   return (
     <Link
       href={getMarketPulseStoryPath(story.slug)}
@@ -236,9 +246,14 @@ function RelatedPulseCard({ story }: { story: MarketPulseStory }) {
   );
 }
 
-function RelatedPulseRail({ currentStory }: { currentStory: MarketPulseStory }) {
-  const stories = getMarketPulseStories();
-  const relatedStories = stories
+function RelatedPulseRail({
+  currentStory,
+  feedStories,
+}: {
+  currentStory: MarketPulseStory;
+  feedStories: MarketFeedArticleCard[];
+}) {
+  const relatedStories = feedStories
     .filter((story) => story.slug !== currentStory.slug)
     .sort((left, right) => {
       const leftScore =
@@ -251,6 +266,10 @@ function RelatedPulseRail({ currentStory }: { currentStory: MarketPulseStory }) 
       return rightScore - leftScore;
     })
     .slice(0, 3);
+
+  if (!relatedStories.length) {
+    return null;
+  }
 
   return (
     <section className="rounded-[1.3rem] border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] p-5 shadow-[0_10px_24px_rgba(24,24,27,0.04)]">
@@ -273,15 +292,24 @@ function RelatedPulseRail({ currentStory }: { currentStory: MarketPulseStory }) 
   );
 }
 
-function TrendingNowRail({ currentStory }: { currentStory: MarketPulseStory }) {
-  const stories = getMarketPulseStories();
-  const trendingStories = stories
+function TrendingNowRail({
+  currentStory,
+  feedStories,
+}: {
+  currentStory: MarketPulseStory;
+  feedStories: MarketFeedArticleCard[];
+}) {
+  const trendingStories = feedStories
     .filter((story) => story.slug !== currentStory.slug)
     .sort(
       (left, right) =>
         parseCompactMetric(right.metrics.likes) - parseCompactMetric(left.metrics.likes),
     )
     .slice(0, 5);
+
+  if (!trendingStories.length) {
+    return null;
+  }
 
   return (
     <section className="rounded-[1.3rem] border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] p-5 shadow-[0_10px_24px_rgba(24,24,27,0.04)]">
@@ -318,32 +346,29 @@ function TrendingNowRail({ currentStory }: { currentStory: MarketPulseStory }) {
   );
 }
 
-export function MarketPulseStoryBody({ story }: { story: MarketPulseStory }) {
-  const {
-    summaryLabel,
-    summaryHeading,
-    introParagraphs,
-    quote,
-    breakdown,
-    analysis,
-    cta,
-    takeaways,
-  } = marketPulseStoryBodyContent;
+export function MarketPulseStoryBody({
+  story,
+  feedStories,
+}: {
+  story: MarketPulseStory;
+  feedStories: MarketFeedArticleCard[];
+}) {
+  const bodyHtml = decorateBodyHtmlWithHeadingIds(story.bodyHtml);
 
   return (
     <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
       <article className="min-w-0 rounded-[1.6rem] border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] px-5 py-6 shadow-[0_14px_34px_rgba(24,24,27,0.05)] sm:px-7 sm:py-8 lg:px-9">
         <header className="border-b border-[color:var(--color-border-ui-subtle)] pb-7">
           <p className="text-[0.74rem] font-semibold tracking-[0.18em] text-[var(--color-brand)] uppercase">
-            {summaryLabel}
+            Story Analysis
           </p>
           <h2 className="type-display mt-3 max-w-[42rem] text-[2rem] font-semibold text-zinc-950 sm:text-[2.2rem]">
-            {summaryHeading}
+            {story.summaryHeading}
           </h2>
         </header>
 
         <div className="mt-8 space-y-9">
-          <MobileStoryOutlineCard />
+          <MobileStoryOutlineCard bodyHtml={story.bodyHtml} />
 
           <section id="story-overview" aria-labelledby="story-overview-heading">
             <h2
@@ -353,117 +378,46 @@ export function MarketPulseStoryBody({ story }: { story: MarketPulseStory }) {
               Market overview
             </h2>
             <div className="mt-4 max-w-[41rem] space-y-5 text-[1.05rem] leading-8 text-zinc-700 lg:text-[1.08rem] lg:leading-8">
-              {introParagraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
+              <p>{story.excerpt}</p>
             </div>
           </section>
 
-          <figure className="border-l-4 border-[var(--color-brand)] bg-[var(--color-surface-ui-muted)] px-5 py-5">
-            <blockquote className="type-title max-w-[38rem] text-[1.25rem] font-medium text-zinc-900">
-              <span>&ldquo;</span>
-              {quote.text}
-              <span>&rdquo;</span>
-            </blockquote>
-            <figcaption className="mt-3 text-[0.92rem] font-medium text-[var(--color-text-ui-muted)]">
-              {quote.source}
-            </figcaption>
-          </figure>
-
-          <section
-            id="story-breakdown"
-            aria-labelledby="story-breakdown-heading"
-            className="border-t border-[color:var(--color-border-ui-subtle)] pt-8"
-          >
-            <h2
-              id="story-breakdown-heading"
-              className="type-display text-[1.55rem] font-semibold text-zinc-950"
-            >
-              {breakdown.heading}
-            </h2>
-            <ol className="mt-5 space-y-4">
-              {breakdown.points.map((point, index) => (
-                <li key={point} className="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-4">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-[0.88rem] font-semibold text-zinc-700">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <p className="pt-1 text-[1.02rem] leading-8 text-zinc-700">{point}</p>
-                </li>
-              ))}
-            </ol>
-          </section>
-
-          <section
-            id="story-analysis-detail"
-            aria-labelledby="story-analysis-detail-heading"
-            className="border-t border-[color:var(--color-border-ui-subtle)] pt-8"
-          >
-            <h2
-              id="story-analysis-detail-heading"
-              className="type-display text-[1.55rem] font-semibold text-zinc-950"
-            >
-              {analysis.heading}
-            </h2>
-            <div className="mt-4 max-w-[41rem] space-y-5 text-[1.03rem] leading-8 text-zinc-700">
-              {analysis.paragraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-            </div>
-          </section>
-
-          <section
-            id="story-key-points"
-            aria-labelledby="story-key-points-heading"
-            className="border-t border-[color:var(--color-border-ui-subtle)] pt-8"
-          >
-            <h2
-              id="story-key-points-heading"
-              className="type-display text-[1.55rem] font-semibold text-zinc-950"
-            >
-              {takeaways.heading}
-            </h2>
-            <ul className="mt-5 space-y-3">
-              {takeaways.items.map((item) => (
-                <li key={item} className="flex gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="mt-3 h-1.5 w-1.5 rounded-full bg-[var(--color-brand)]"
-                  />
-                  <p className="text-[1.02rem] leading-8 text-zinc-700">{item}</p>
-                </li>
-              ))}
-            </ul>
+          <section className="border-t border-[color:var(--color-border-ui-subtle)] pt-8">
+            <div
+              className="market-pulse-body-content max-w-[44rem] text-zinc-700 [&_a]:text-[var(--color-brand)] [&_a]:underline [&_a]:underline-offset-4 [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--color-brand)] [&_blockquote]:bg-[var(--color-surface-ui-muted)] [&_blockquote]:px-5 [&_blockquote]:py-5 [&_blockquote]:text-[1.15rem] [&_blockquote]:font-medium [&_h2]:type-display [&_h2]:mt-10 [&_h2]:text-[1.55rem] [&_h2]:font-semibold [&_h2]:text-zinc-950 [&_h3]:mt-8 [&_h3]:text-[1.2rem] [&_h3]:font-semibold [&_h3]:text-zinc-950 [&_img]:my-6 [&_img]:rounded-[1.4rem] [&_img]:border [&_img]:border-[color:var(--color-border-ui-subtle)] [&_img]:shadow-[0_12px_28px_rgba(24,24,27,0.08)] [&_ol]:my-5 [&_ol]:space-y-3 [&_ol]:pl-5 [&_p]:my-5 [&_p]:text-[1.03rem] [&_p]:leading-8 [&_strong]:font-semibold [&_ul]:my-5 [&_ul]:space-y-3 [&_ul]:pl-5"
+              dangerouslySetInnerHTML={{ __html: bodyHtml }}
+            />
           </section>
 
           <section className="rounded-[1.3rem] border border-[color:var(--color-border-ui-subtle)] bg-[var(--color-surface-ui-muted)] px-5 py-6">
             <h2 className="type-display text-[1.6rem] font-semibold text-zinc-950">
-              {cta.title}
+              {storyCtaContent.title}
             </h2>
             <p className="mt-3 max-w-[36rem] text-[1rem] leading-7 text-[var(--color-text-ui-soft)]">
-              {cta.description}
+              {storyCtaContent.description}
             </p>
             <Link
               href="/"
               className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-zinc-950 px-5 text-[0.92rem] font-semibold text-white transition-colors hover:bg-zinc-800"
             >
-              {cta.buttonLabel}
+              {storyCtaContent.buttonLabel}
             </Link>
           </section>
 
           <section className="border-t border-[color:var(--color-border-ui-subtle)] pt-8">
-            <StoryTagList />
+            <StoryTagList tags={story.tags} />
           </section>
 
           <StoryReactionGrid />
 
-          <StoryPagination story={story} />
+          <StoryPagination story={story} feedStories={feedStories} />
         </div>
       </article>
 
       <aside className="hidden space-y-4 xl:sticky xl:top-24 xl:block">
-        <StoryOutlineCard />
-        <RelatedPulseRail currentStory={story} />
-        <TrendingNowRail currentStory={story} />
+        <StoryOutlineCard bodyHtml={story.bodyHtml} />
+        <RelatedPulseRail currentStory={story} feedStories={feedStories} />
+        <TrendingNowRail currentStory={story} feedStories={feedStories} />
       </aside>
     </section>
   );

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { marketPulseFeedPath } from "@/features/market-pulse/lib/routes";
-import { marketPulseStoryTopContent } from "@/features/market-pulse-story/data/storyPageTopContent";
+import { marketPulseStorySponsorCard } from "@/features/market-pulse-story/data/storySponsorCard";
 import { MarketPulseStoryHeroCard } from "@/features/market-pulse-story/components/MarketPulseStoryHeroCard";
 import { MarketPulseStoryMetaBar } from "@/features/market-pulse-story/components/MarketPulseStoryMetaBar";
 import { MarketPulseStorySponsoredCard } from "@/features/market-pulse-story/components/MarketPulseStorySponsoredCard";
@@ -38,13 +38,10 @@ export function MarketPulseStoryTopShell({ story }: { story: MarketPulseStory })
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-stretch">
         <div>
           <MarketPulseStoryHeroCard story={story} />
-          <MarketPulseStoryMetaBar
-            author={marketPulseStoryTopContent.author}
-            story={story}
-          />
+          <MarketPulseStoryMetaBar story={story} />
         </div>
 
-        <MarketPulseStorySponsoredCard sponsorCard={marketPulseStoryTopContent.sponsorCard} />
+        <MarketPulseStorySponsoredCard sponsorCard={marketPulseStorySponsorCard} />
       </div>
     </section>
   );

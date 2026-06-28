@@ -50,6 +50,7 @@ export type MarketFeedArticleBadge =
 export type MarketFeedArticleCard = {
   kind: "article";
   id: string;
+  slug: string;
   badge: MarketFeedArticleBadge;
   title: string;
   excerpt: string;

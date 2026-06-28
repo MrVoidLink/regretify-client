@@ -11,6 +11,7 @@ import type {
   MarketFeedCategoryId,
   MarketFeedViewMode,
 } from "@/features/market-feed/types";
+import type { MarketPulseFeedResponse } from "@/features/market-pulse/lib/publicApi";
 
 function buildCategoryHref(
   pathname: string,
@@ -138,6 +139,7 @@ type MarketFeedInteractivePanelProps = {
   initialPage: number;
   totalPages: number;
   initialViewMode: MarketFeedViewMode;
+  summary: MarketPulseFeedResponse["summary"];
 };
 
 export function MarketFeedInteractivePanel({
@@ -146,6 +148,7 @@ export function MarketFeedInteractivePanel({
   initialPage,
   totalPages,
   initialViewMode,
+  summary: _summary,
 }: MarketFeedInteractivePanelProps) {
   const [viewMode, setViewMode] = useState<MarketFeedViewMode>(initialViewMode);
   const pathname = usePathname();

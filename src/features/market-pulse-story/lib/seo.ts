@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { getMarketPulseStoryPath, marketPulsePath } from "@/features/market-pulse/lib/routes";
-import { marketPulseStoryBodyContent } from "@/features/market-pulse-story/data/storyPageBodyContent";
-import { marketPulseStoryTopContent } from "@/features/market-pulse-story/data/storyPageTopContent";
 import type { MarketPulseStory } from "@/features/market-pulse-story/types";
 
 function getSiteUrl() {
@@ -23,7 +21,7 @@ function parseCompactMetric(value: string) {
 }
 
 function buildStoryDescription(story: MarketPulseStory) {
-  const description = `${story.excerpt} ${marketPulseStoryBodyContent.summaryHeading}`;
+  const description = `${story.excerpt} ${story.summaryHeading}`.trim();
 
   if (description.length <= 160) {
     return description;
@@ -33,39 +31,26 @@ function buildStoryDescription(story: MarketPulseStory) {
 }
 
 function buildStoryKeywords(story: MarketPulseStory) {
-  return [
-    story.category,
-    story.badge,
-    ...marketPulseStoryBodyContent.tags.map((tag) => tag.replace(/^#/, "")),
-  ];
+  return [story.category, story.badge, ...story.tags.map((tag) => tag.replace(/^#/, ""))];
 }
 
-function buildStoryWordCount() {
-  const segments = [
-    ...marketPulseStoryBodyContent.introParagraphs,
-    marketPulseStoryBodyContent.quote.text,
-    ...marketPulseStoryBodyContent.breakdown.points,
-    ...marketPulseStoryBodyContent.analysis.paragraphs,
-    ...marketPulseStoryBodyContent.takeaways.items,
-    marketPulseStoryBodyContent.cta.description,
-  ];
-
-  return segments.join(" ").trim().split(/\s+/).length;
+function buildStoryWordCount(story: MarketPulseStory) {
+  const bodyText = story.bodyHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return bodyText ? bodyText.split(/\s+/).length : 0;
 }
 
 export function buildMarketPulseStoryMetadata(story: MarketPulseStory): Metadata {
-  const author = marketPulseStoryTopContent.author;
   const canonical = toAbsoluteUrl(getMarketPulseStoryPath(story.slug));
   const description = buildStoryDescription(story);
   const heroImageUrl = toAbsoluteUrl(
-    "/images/market-pulse-story/market-pulse-story-hero-v2.png",
+    story.storyHeroImageSrc ?? "/images/market-pulse-story/market-pulse-story-hero-v2.png",
   );
 
   return {
     title: `${story.title} | Regretify`,
     description,
     keywords: buildStoryKeywords(story),
-    authors: [{ name: author.name }],
+    authors: [{ name: story.author.name }],
     category: story.category,
     alternates: {
       canonical,
@@ -76,8 +61,8 @@ export function buildMarketPulseStoryMetadata(story: MarketPulseStory): Metadata
       title: story.title,
       description,
       siteName: "Regretify",
-      publishedTime: author.publishedAtIso,
-      authors: [author.name],
+      publishedTime: story.author.publishedAtIso,
+      authors: [story.author.name],
       section: story.category,
       tags: buildStoryKeywords(story),
       images: [
@@ -99,10 +84,9 @@ export function buildMarketPulseStoryMetadata(story: MarketPulseStory): Metadata
 }
 
 export function buildMarketPulseStoryJsonLd(story: MarketPulseStory) {
-  const author = marketPulseStoryTopContent.author;
   const canonical = toAbsoluteUrl(getMarketPulseStoryPath(story.slug));
   const heroImageUrl = toAbsoluteUrl(
-    "/images/market-pulse-story/market-pulse-story-hero-v2.png",
+    story.storyHeroImageSrc ?? "/images/market-pulse-story/market-pulse-story-hero-v2.png",
   );
   const description = buildStoryDescription(story);
   const keywords = buildStoryKeywords(story);
@@ -133,15 +117,15 @@ export function buildMarketPulseStoryJsonLd(story: MarketPulseStory) {
         headline: story.title,
         description,
         image: [heroImageUrl],
-        datePublished: author.publishedAtIso,
-        dateModified: author.publishedAtIso,
+        datePublished: story.author.publishedAtIso,
+        dateModified: story.author.publishedAtIso,
         articleSection: story.category,
         keywords,
-        wordCount: buildStoryWordCount(),
+        wordCount: buildStoryWordCount(story),
         author: {
           "@type": "Organization",
-          name: author.name,
-          description: author.role,
+          name: story.author.name,
+          description: story.author.role,
         },
         publisher: {
           "@type": "Organization",

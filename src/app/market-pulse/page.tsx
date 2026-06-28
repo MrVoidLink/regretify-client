@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { MarketFeedPage } from "@/features/market-feed/components/MarketFeedPage";
 import {
-  getMarketFeedCardsThroughPage,
-  getMarketFeedTotalPages,
-  normalizeMarketFeedPage,
-} from "@/features/market-feed/lib/feedPagination";
-import {
   normalizeMarketFeedCategory,
   normalizeMarketFeedViewMode,
 } from "@/features/market-feed/lib/feedQueryState";
+import {
+  fetchMarketPulseFeedThroughPage,
+  toMarketFeedArticleCard,
+} from "@/features/market-pulse/lib/publicApi";
 
 export const metadata: Metadata = {
   title: "Market Pulse | Regretify",
@@ -19,19 +18,33 @@ export const metadata: Metadata = {
   },
 };
 
+function normalizeMarketFeedPage(input: string | string[] | undefined) {
+  const raw = Array.isArray(input) ? input[0] : input;
+  const page = Number.parseInt(raw ?? "1", 10);
+
+  if (!Number.isFinite(page) || page < 1) {
+    return 1;
+  }
+
+  return page;
+}
+
 export default async function MarketPulse(props: PageProps<"/market-pulse">) {
   const query = await props.searchParams;
   const initialCategory = normalizeMarketFeedCategory(query.category);
-  const initialPage = normalizeMarketFeedPage(query.page, initialCategory);
+  const requestedPage = normalizeMarketFeedPage(query.page);
   const initialViewMode = normalizeMarketFeedViewMode(query.view);
+  const feedResponse = await fetchMarketPulseFeedThroughPage(requestedPage, initialCategory);
+  const initialPage = Math.min(requestedPage, feedResponse.totalPages);
 
   return (
     <MarketFeedPage
-      initialCards={getMarketFeedCardsThroughPage(initialPage, initialCategory)}
+      initialCards={feedResponse.items.map(toMarketFeedArticleCard)}
       initialCategory={initialCategory}
       initialPage={initialPage}
-      totalPages={getMarketFeedTotalPages(initialCategory)}
+      totalPages={feedResponse.totalPages}
       initialViewMode={initialViewMode}
+      summary={feedResponse.summary}
     />
   );
 }

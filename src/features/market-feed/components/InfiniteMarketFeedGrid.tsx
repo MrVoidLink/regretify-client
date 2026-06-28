@@ -3,12 +3,13 @@
 import { startTransition, useEffect, useEffectEvent, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { MarketFeedCardItem } from "@/features/market-feed/components/MarketFeedCard";
-import { getMarketFeedCardsPage } from "@/features/market-feed/lib/feedPagination";
 import type {
   MarketFeedCard,
   MarketFeedCategoryId,
   MarketFeedViewMode,
 } from "@/features/market-feed/types";
+import type { MarketPulseFeedResponse } from "@/features/market-pulse/lib/publicApi";
+import { toMarketFeedArticleCard } from "@/features/market-pulse/lib/publicApi";
 
 type InfiniteMarketFeedGridProps = {
   initialCards: MarketFeedCard[];
@@ -44,7 +45,28 @@ export function InfiniteMarketFeedGrid({
     setIsLoading(true);
 
     const nextPage = loadedPage + 1;
-    const nextCards = getMarketFeedCardsPage(nextPage, category);
+    const query = new URLSearchParams({
+      page: String(nextPage),
+      limit: "12",
+    });
+
+    if (category !== "all") {
+      query.set("category", category);
+    }
+
+    const response = await fetch(`/api/market-pulse/posts?${query.toString()}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      isLoadingRef.current = false;
+      setIsLoading(false);
+      return;
+    }
+
+    const payload = (await response.json()) as MarketPulseFeedResponse;
+    const nextCards = payload.items.map(toMarketFeedArticleCard);
 
     startTransition(() => {
       setVisibleCards((currentCards) => [...currentCards, ...nextCards]);

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { MarketPulseStory } from "@/features/market-pulse-story/types";
 
 const marketPulseStoryHeroImagePath = "/images/market-pulse-story/market-pulse-story-hero-v2.png";
@@ -24,19 +23,18 @@ function HeroPill({
 }
 
 export function MarketPulseStoryHeroCard({ story }: { story: MarketPulseStory }) {
+  const storyHeroImageSrc = story.storyHeroImageSrc ?? marketPulseStoryHeroImagePath;
+
   return (
     <section className="overflow-hidden rounded-[2rem] border border-violet-200/40 bg-[#11143d] shadow-[0_30px_70px_rgba(36,27,89,0.18)]">
       <div className="relative min-h-[17.5rem] overflow-hidden sm:min-h-[23rem] lg:min-h-[25rem]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(116,88,255,0.34)_0%,rgba(116,88,255,0.08)_28%,rgba(17,20,61,0)_60%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,#11143d_0%,rgba(17,20,61,0.98)_36%,rgba(17,20,61,0.42)_60%,rgba(17,20,61,0)_78%)] sm:bg-[linear-gradient(90deg,#11143d_0%,rgba(17,20,61,0.94)_32%,rgba(17,20,61,0.2)_56%,rgba(17,20,61,0)_72%)]" />
         <div className="absolute inset-y-0 right-0 w-full sm:w-[72%] lg:w-[62%]">
-          <Image
-            src={marketPulseStoryHeroImagePath}
+          <img
+            src={storyHeroImageSrc}
             alt={`${story.title} hero artwork`}
-            fill
-            className="object-cover object-[84%_center] sm:object-[72%_center] lg:object-[78%_center]"
-            sizes="(max-width: 1024px) 100vw, 900px"
-            priority
+            className="h-full w-full object-cover object-[84%_center] sm:object-[72%_center] lg:object-[78%_center]"
           />
         </div>
 

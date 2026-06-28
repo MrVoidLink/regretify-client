@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
-import type { MarketPulseStory, MarketPulseStoryAuthor } from "@/features/market-pulse-story/types";
+import type { MarketPulseStory } from "@/features/market-pulse-story/types";
 
 function EyeIcon() {
   return (
@@ -132,24 +131,34 @@ function StorySaveButton() {
 }
 
 export function MarketPulseStoryMetaBar({
-  author,
   story,
 }: {
-  author: MarketPulseStoryAuthor;
   story: MarketPulseStory;
 }) {
+  const author = story.author;
+  const authorInitials = author.name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+
   return (
     <section className="rounded-b-[2rem] border border-t-0 border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,249,255,0.94)_100%)] px-5 py-4 shadow-[0_16px_40px_rgba(24,24,27,0.06)] sm:px-7 lg:px-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-3">
           <div className="relative h-13 w-13 shrink-0 overflow-hidden rounded-full shadow-[0_10px_24px_rgba(24,24,27,0.12)]">
-            <Image
-              src={author.avatarSrc}
-              alt={`${author.name} avatar`}
-              fill
-              className="bg-white object-cover object-top"
-              sizes="52px"
-            />
+            {author.avatarSrc ? (
+              <img
+                src={author.avatarSrc}
+                alt={`${author.name} avatar`}
+                className="h-full w-full bg-white object-cover object-top"
+              />
+            ) : (
+              <div className="grid h-full w-full place-items-center bg-[linear-gradient(180deg,var(--color-brand-soft)_0%,var(--color-brand-soft-strong)_100%)] text-[1rem] font-semibold text-[var(--color-brand-strong)]">
+                {authorInitials || "R"}
+              </div>
+            )}
           </div>
 
           <div className="min-w-0">
