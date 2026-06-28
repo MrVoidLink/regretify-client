@@ -60,7 +60,13 @@ function getCoreApiBaseUrl() {
     throw new Error("Missing required env: CORE_API_BASE_URL");
   }
 
-  return value.replace(/\/$/, "");
+  const normalized = value.replace(/\/$/, "");
+
+  if (normalized.endsWith("/api")) {
+    return normalized;
+  }
+
+  return `${normalized}/api`;
 }
 
 function normalizeCategoryLabel(input: string) {
