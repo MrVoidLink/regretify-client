@@ -214,11 +214,6 @@ function FeedCardVisual({ card }: { card: MarketFeedCard }) {
       </div>
 
       <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-        {card.kind === "article" && card.accent ? (
-          <p className="text-[0.72rem] font-semibold tracking-[0.08em] text-white/72 uppercase">
-            {card.accent}
-          </p>
-        ) : null}
         {card.kind === "sponsored" ? (
           <p className="text-[0.72rem] font-semibold tracking-[0.08em] text-white/72 uppercase">
             {card.destinationLabel}
@@ -381,11 +376,6 @@ export function MarketFeedCardItem({
             {card.badge}
           </div>
           <div className="absolute right-4 top-4 text-[0.74rem] text-white/88">{card.timeAgo}</div>
-          {card.accent ? (
-            <p className="absolute left-4 bottom-22 text-[0.72rem] font-semibold tracking-[0.08em] text-white/76 uppercase">
-              {card.accent}
-            </p>
-          ) : null}
           <div className="absolute inset-x-0 bottom-0 h-[54%] bg-[linear-gradient(180deg,rgba(13,10,24,0)_0%,rgba(13,10,24,0.18)_18%,rgba(13,10,24,0.46)_42%,rgba(13,10,24,0.78)_74%,rgba(13,10,24,0.96)_100%)]" />
         </div>
 

@@ -266,12 +266,6 @@ function StoryCard({ story }: { story: PulseStory }) {
       </div>
 
       <StoryVisual story={story} />
-
-      {story.accent ? (
-        <div className="absolute bottom-5 right-5 rounded-full bg-emerald-500/16 px-3 py-1.5 text-[1rem] font-semibold tracking-[-0.04em] text-emerald-300 backdrop-blur-sm">
-          {story.accent}
-        </div>
-      ) : null}
     </article>
   );
 }

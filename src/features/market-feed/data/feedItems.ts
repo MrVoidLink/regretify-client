@@ -31,7 +31,6 @@ const marketFeedCardSeeds: MarketFeedArticleCard[] = [
       views: "12.4K",
       likes: "3.6K",
     },
-    accent: "BTC +7.2%",
     tone: "midnight",
   },
   {
@@ -77,7 +76,6 @@ const marketFeedCardSeeds: MarketFeedArticleCard[] = [
       views: "5.4K",
       likes: "3.6K",
     },
-    accent: "TSLA +9%",
     tone: "amber",
   },
   {
@@ -108,7 +106,6 @@ const marketFeedCardSeeds: MarketFeedArticleCard[] = [
       views: "11.8K",
       likes: "3.2K",
     },
-    accent: "ETH > $3.5K",
     tone: "emerald",
   },
   {

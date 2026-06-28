@@ -23,7 +23,6 @@ export const pulseStories: PulseStory[] = [
     size: "hero",
     tone: "night",
     visual: "chart",
-    accent: "+7.21%",
   },
   {
     id: "pepe-party",

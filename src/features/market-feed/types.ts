@@ -61,7 +61,6 @@ export type MarketFeedArticleCard = {
     views: string;
     likes: string;
   };
-  accent?: string;
   tone: MarketFeedCardTone;
 };
 

@@ -370,7 +370,11 @@ export function MarketPulseStoryBody({
         <div className="mt-8 space-y-9">
           <MobileStoryOutlineCard bodyHtml={story.bodyHtml} />
 
-          <section id="story-overview" aria-labelledby="story-overview-heading">
+          <section
+            id="story-overview"
+            aria-labelledby="story-overview-heading"
+            className="scroll-mt-28 lg:scroll-mt-32"
+          >
             <h2
               id="story-overview-heading"
               className="type-title text-[1.3rem] font-semibold text-zinc-950"
@@ -384,7 +388,7 @@ export function MarketPulseStoryBody({
 
           <section className="border-t border-[color:var(--color-border-ui-subtle)] pt-8">
             <div
-              className="market-pulse-body-content max-w-[44rem] text-zinc-700 [&_a]:text-[var(--color-brand)] [&_a]:underline [&_a]:underline-offset-4 [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--color-brand)] [&_blockquote]:bg-[var(--color-surface-ui-muted)] [&_blockquote]:px-5 [&_blockquote]:py-5 [&_blockquote]:text-[1.15rem] [&_blockquote]:font-medium [&_h2]:type-display [&_h2]:mt-10 [&_h2]:text-[1.55rem] [&_h2]:font-semibold [&_h2]:text-zinc-950 [&_h3]:mt-8 [&_h3]:text-[1.2rem] [&_h3]:font-semibold [&_h3]:text-zinc-950 [&_img]:my-6 [&_img]:rounded-[1.4rem] [&_img]:border [&_img]:border-[color:var(--color-border-ui-subtle)] [&_img]:shadow-[0_12px_28px_rgba(24,24,27,0.08)] [&_ol]:my-5 [&_ol]:space-y-3 [&_ol]:pl-5 [&_p]:my-5 [&_p]:text-[1.03rem] [&_p]:leading-8 [&_strong]:font-semibold [&_ul]:my-5 [&_ul]:space-y-3 [&_ul]:pl-5"
+              className="market-pulse-body-content max-w-[44rem] text-zinc-700 [&_a]:text-[var(--color-brand)] [&_a]:underline [&_a]:underline-offset-4 [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--color-brand)] [&_blockquote]:bg-[var(--color-surface-ui-muted)] [&_blockquote]:px-5 [&_blockquote]:py-5 [&_blockquote]:text-[1.15rem] [&_blockquote]:font-medium [&_h2]:type-display [&_h2]:mt-10 [&_h2]:scroll-mt-28 [&_h2]:text-[1.55rem] [&_h2]:font-semibold [&_h2]:text-zinc-950 lg:[&_h2]:scroll-mt-32 [&_h3]:mt-8 [&_h3]:text-[1.2rem] [&_h3]:font-semibold [&_h3]:text-zinc-950 [&_img]:my-6 [&_img]:rounded-[1.4rem] [&_img]:border [&_img]:border-[color:var(--color-border-ui-subtle)] [&_img]:shadow-[0_12px_28px_rgba(24,24,27,0.08)] [&_ol]:my-5 [&_ol]:space-y-3 [&_ol]:pl-5 [&_p]:my-5 [&_p]:text-[1.03rem] [&_p]:leading-8 [&_strong]:font-semibold [&_ul]:my-5 [&_ul]:space-y-3 [&_ul]:pl-5"
               dangerouslySetInnerHTML={{ __html: bodyHtml }}
             />
           </section>

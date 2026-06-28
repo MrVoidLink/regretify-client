@@ -17,7 +17,6 @@ type PublicMarketPulsePost = {
   excerpt: string;
   category: string;
   badge: string;
-  accent: string;
   summaryHeading: string;
   bodyHtml: string;
   tags: string;
@@ -192,7 +191,6 @@ export function toMarketFeedArticleCard(
       views: formatCompactMetric(post.viewsCount),
       likes: formatCompactMetric(post.likesCount),
     },
-    accent: post.accent?.trim() || undefined,
     tone: mapToneFromPost(post),
   };
 }

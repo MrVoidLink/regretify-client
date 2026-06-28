@@ -43,7 +43,6 @@ export type PulseStory = {
   size: PulseStorySize;
   tone: PulseStoryTone;
   visual: PulseStoryVisual;
-  accent?: string;
 };
 
 export type PulseTrendTone = "positive" | "negative";
