@@ -1,5 +1,4 @@
-import { MarketPulseStoryBody } from "@/features/market-pulse-story/components/MarketPulseStoryBody";
-import { MarketPulseStoryTopShell } from "@/features/market-pulse-story/components/MarketPulseStoryTopShell";
+import { MarketPulseStoryRuntime } from "@/features/market-pulse-story/components/MarketPulseStoryRuntime";
 import { buildMarketPulseStoryJsonLd } from "@/features/market-pulse-story/lib/seo";
 import type { MarketPulseStory } from "@/features/market-pulse-story/types";
 import type { MarketFeedArticleCard } from "@/features/market-feed/types";
@@ -21,10 +20,7 @@ export function MarketPulseStoryPage({
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <article className="mx-auto flex min-h-screen w-full max-w-[96rem] flex-col gap-7 px-4 pt-2 pb-6 sm:px-6 sm:pt-2.5 sm:pb-8 lg:px-8 lg:pt-3 lg:pb-10">
-        <MarketPulseStoryTopShell story={story} />
-        <MarketPulseStoryBody story={story} feedStories={feedStories} />
-      </article>
+      <MarketPulseStoryRuntime story={story} feedStories={feedStories} />
     </main>
   );
 }

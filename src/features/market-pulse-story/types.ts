@@ -6,6 +6,7 @@ export type MarketPulseStory = MarketFeedArticleCard & {
   tags: string[];
   feedHeroImageSrc: string | null;
   storyHeroImageSrc: string | null;
+  viewsCount: number;
   author: MarketPulseStoryAuthor;
 };
 

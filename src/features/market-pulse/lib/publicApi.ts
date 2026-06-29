@@ -216,6 +216,7 @@ export function toMarketPulseStory(post: PublicMarketPulsePost): MarketPulseStor
     tags: normalizeTags(post.tags),
     feedHeroImageSrc: toAbsoluteAssetUrl(post.feedHeroAssetKey),
     storyHeroImageSrc: toAbsoluteAssetUrl(post.storyHeroAssetKey) ?? defaultStoryHeroImagePath,
+    viewsCount: post.viewsCount,
     author: toMarketPulseStoryAuthor(post),
   };
 }
