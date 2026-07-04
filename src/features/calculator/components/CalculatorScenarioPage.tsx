@@ -273,7 +273,7 @@ function MarketChartModule({
         </div>
       ) : null}
 
-      <div className="relative mt-1.5 min-h-[7.6rem] flex-1 overflow-hidden rounded-[0.8rem] bg-[linear-gradient(180deg,#ffffff_0%,#fbf9ff_100%)]">
+      <div className="relative mt-3.5 min-h-[8.3rem] flex-1 overflow-visible rounded-[0.8rem] bg-[linear-gradient(180deg,#ffffff_0%,#fbf9ff_100%)]">
         <div className="absolute inset-y-3 left-0 z-10 w-16 pr-2 text-right text-[0.56rem] text-[var(--color-text-ui-muted)]">
           {timeline.priceAxisLabels.map((tick, index) => (
             <span
