@@ -32,6 +32,7 @@ import {
   getAvailableScenarioRangePresets,
   getDefaultScenarioDates,
   getScenarioDatesForRangePreset,
+  isoDateFromDate,
   minimumRangeProgress,
   monthLabels,
   progressFromChartX,
@@ -46,7 +47,43 @@ import type {
   CalculatorScenarioAsset,
 } from "@/features/calculator/types";
 
+function formatChartPriceLabel(value: string | null) {
+  const numericValue = Number(value ?? "");
+
+  if (!Number.isFinite(numericValue) || numericValue <= 0) {
+    return "--";
+  }
+
+  const maximumFractionDigits =
+    numericValue >= 1000 ? 0 : numericValue >= 1 ? 2 : numericValue >= 0.01 ? 4 : 6;
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits,
+  }).format(numericValue);
+}
+
+function findHistoryPointForDate(
+  history: CalculatorAssetHistoryPoint[],
+  date: Date,
+) {
+  const targetDate = isoDateFromDate(date);
+  let selectedPoint = history[0] ?? null;
+
+  for (const point of history) {
+    if (point.date > targetDate) {
+      break;
+    }
+
+    selectedPoint = point;
+  }
+
+  return selectedPoint ?? history[history.length - 1] ?? null;
+}
+
 function MarketChartModule({
+  history,
   timeline,
   isDataReady,
   startDate,
@@ -56,6 +93,7 @@ function MarketChartModule({
   onStartDateChange,
   onEndDateChange,
 }: {
+  history: CalculatorAssetHistoryPoint[];
   timeline: ScenarioTimelineModel;
   isDataReady: boolean;
   startDate: Date;
@@ -84,6 +122,9 @@ function MarketChartModule({
       x: startChartX,
       y: chartYAtX(startChartX, timeline),
       progress: safeStart,
+      priceLabel: formatChartPriceLabel(
+        findHistoryPointForDate(history, startDate)?.closePrice ?? null,
+      ),
     },
     {
       id: "end-handle",
@@ -91,6 +132,9 @@ function MarketChartModule({
       x: endChartX,
       y: chartYAtX(endChartX, timeline),
       progress: safeEnd,
+      priceLabel: formatChartPriceLabel(
+        findHistoryPointForDate(history, endDate)?.closePrice ?? null,
+      ),
     },
   ];
 
@@ -268,6 +312,15 @@ function MarketChartModule({
           <polyline
             points={chartLinePoints}
             fill="none"
+            stroke="rgba(124,58,237,0.14)"
+            strokeWidth="3.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
+          <polyline
+            points={chartLinePoints}
+            fill="none"
             stroke="#7c3aed"
             strokeWidth="1.6"
             strokeLinecap="round"
@@ -277,36 +330,43 @@ function MarketChartModule({
         </svg>
 
         {handles.map((handle) => (
-          <button
+          <div
             key={`${handle.id}-chart`}
-            type="button"
-            role="slider"
-            aria-label={handle.label}
-            aria-orientation="horizontal"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(handle.progress)}
-            aria-disabled={!isDataReady}
-            className={`absolute z-20 grid h-7 w-7 -translate-x-1/2 -translate-y-1/2 touch-none place-items-center rounded-full border-2 border-[var(--color-brand)] bg-white shadow-[0_8px_18px_rgba(111,67,255,0.2)] outline-none transition-transform focus-visible:ring-2 focus-visible:ring-[var(--color-brand)] ${
-              isDataReady
-                ? "cursor-grab active:scale-105 active:cursor-grabbing"
-                : "cursor-not-allowed opacity-60"
-            }`}
+            className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
             style={{ left: `${handle.x}%`, top: `${handle.y}%` }}
-            onPointerDown={(event) =>
-              handlePointerDown(handle.id === "start-handle" ? "start" : "end", event)
-            }
-            onPointerMove={(event) =>
-              handlePointerMove(handle.id === "start-handle" ? "start" : "end", event)
-            }
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            onKeyDown={(event) =>
-              handleKeyDown(handle.id === "start-handle" ? "start" : "end", event)
-            }
           >
-            <span className="pointer-events-none h-2.5 w-2.5 rounded-full bg-[var(--color-brand)]" />
-          </button>
+            <div className="pointer-events-none absolute bottom-[calc(100%+0.38rem)] left-[calc(100%-0.1rem)] whitespace-nowrap rounded-full border border-[color:var(--color-brand-border)] bg-white/96 px-2 py-0.5 text-[0.58rem] font-semibold text-[var(--color-brand-strong)] shadow-[0_10px_18px_rgba(111,67,255,0.14)]">
+              {handle.priceLabel}
+            </div>
+            <button
+              type="button"
+              role="slider"
+              aria-label={handle.label}
+              aria-orientation="horizontal"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(handle.progress)}
+              aria-disabled={!isDataReady}
+              className={`grid h-7 w-7 touch-none place-items-center rounded-full border-2 border-[var(--color-brand)] bg-white shadow-[0_8px_18px_rgba(111,67,255,0.2)] outline-none transition-transform focus-visible:ring-2 focus-visible:ring-[var(--color-brand)] ${
+                isDataReady
+                  ? "cursor-grab active:scale-105 active:cursor-grabbing"
+                  : "cursor-not-allowed opacity-60"
+              }`}
+              onPointerDown={(event) =>
+                handlePointerDown(handle.id === "start-handle" ? "start" : "end", event)
+              }
+              onPointerMove={(event) =>
+                handlePointerMove(handle.id === "start-handle" ? "start" : "end", event)
+              }
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+              onKeyDown={(event) =>
+                handleKeyDown(handle.id === "start-handle" ? "start" : "end", event)
+              }
+            >
+              <span className="pointer-events-none h-2.5 w-2.5 rounded-full bg-[var(--color-brand)]" />
+            </button>
+          </div>
         ))}
 
         <div className="absolute inset-x-9 bottom-2 flex justify-between text-[0.56rem] text-[var(--color-text-ui-muted)]">
@@ -561,6 +621,7 @@ function DateWheelModule({
 
 function LeftScenarioBuilder({
   asset,
+  history,
   timeline,
   isDataReady,
   amount,
@@ -574,6 +635,7 @@ function LeftScenarioBuilder({
   onCalculate,
 }: {
   asset: CalculatorScenarioAsset;
+  history: CalculatorAssetHistoryPoint[];
   timeline: ScenarioTimelineModel;
   isDataReady: boolean;
   amount: string;
@@ -628,6 +690,7 @@ function LeftScenarioBuilder({
       <div className="mt-2.5 flex min-h-0 flex-1 flex-col">
         <InvestmentControls amount={amount} onAmountChange={onAmountChange} />
         <MarketChartModule
+          history={history}
           timeline={timeline}
           isDataReady={isDataReady}
           startDate={startDate}
@@ -752,6 +815,7 @@ export function CalculatorScenarioPage({
             <ScenarioTopBar asset={asset} />
             <LeftScenarioBuilder
               asset={asset}
+              history={history}
               timeline={timeline}
               isDataReady={isDataReady}
               amount={amount}

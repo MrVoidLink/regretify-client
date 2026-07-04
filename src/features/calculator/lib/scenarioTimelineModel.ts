@@ -4,6 +4,8 @@ const chartPlotStart = 6;
 const chartPlotEnd = 96;
 const chartTop = 13;
 const chartBottom = 79;
+const chartSampleCount = 36;
+const chartVisualExponent = 0.78;
 
 export const minimumRangeProgress = 0.35;
 
@@ -155,7 +157,7 @@ export function buildScenarioTimeline(history: CalculatorAssetHistoryPoint[]) {
     } satisfies ScenarioTimelineModel;
   }
 
-  const sampledHistory = sampleHistory(history, Math.min(15, history.length));
+  const sampledHistory = sampleHistory(history, Math.min(chartSampleCount, history.length));
   const closePrices = history
     .map((point) => Number(point.closePrice))
     .filter((value) => Number.isFinite(value) && value > 0);
@@ -170,6 +172,7 @@ export function buildScenarioTimeline(history: CalculatorAssetHistoryPoint[]) {
       Number.isFinite(numericClosePrice) && numericClosePrice > 0
         ? (Math.log(numericClosePrice) - minLog) / logRange
         : 0.5;
+    const visualNormalized = Math.pow(Math.min(1, Math.max(0, normalized)), chartVisualExponent);
 
     return {
       x:
@@ -177,7 +180,7 @@ export function buildScenarioTimeline(history: CalculatorAssetHistoryPoint[]) {
           ? (chartPlotStart + chartPlotEnd) / 2
           : chartPlotStart +
             ((chartPlotEnd - chartPlotStart) * index) / (sampledHistory.length - 1),
-      y: chartBottom - normalized * (chartBottom - chartTop),
+      y: chartBottom - visualNormalized * (chartBottom - chartTop),
     };
   });
 
