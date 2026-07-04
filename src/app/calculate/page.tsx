@@ -1,9 +1,16 @@
 import { redirect } from "next/navigation";
+import { assetSelectionAssets } from "@/features/calculator/data/assetSelection";
+import { getAssetRoute } from "@/features/calculator/lib/assets";
 import {
-  getAssetRoute,
-  getDefaultAssetSelectionAsset,
-} from "@/features/calculator/lib/assets";
+  fetchCalculatorAssets,
+  toAssetSelectionAsset,
+} from "@/features/calculator/lib/publicApi";
 
-export default function CalculateRoute() {
-  redirect(getAssetRoute(getDefaultAssetSelectionAsset()));
+export default async function CalculateRoute() {
+  const assets = await fetchCalculatorAssets()
+    .then((response) => response.items.map(toAssetSelectionAsset))
+    .catch(() => assetSelectionAssets);
+  const defaultAsset = assets.find((asset) => asset.isSelected) ?? assets[0];
+
+  redirect(getAssetRoute(defaultAsset));
 }

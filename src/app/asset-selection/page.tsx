@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { AssetSelectionPage } from "@/features/calculator/components/AssetSelectionPage";
+import { assetSelectionAssets } from "@/features/calculator/data/assetSelection";
 import { calculatorMarkets } from "@/features/calculator/data/markets";
+import {
+  fetchCalculatorAssets,
+  toAssetSelectionAsset,
+} from "@/features/calculator/lib/publicApi";
 import type { CalculatorMarketId } from "@/features/calculator/types";
 
 export const metadata: Metadata = {
@@ -25,6 +30,14 @@ export default async function AssetSelectionRoute({
   searchParams: Promise<{ market?: string | string[] }>;
 }) {
   const resolvedSearchParams = await searchParams;
+  const assets = await fetchCalculatorAssets()
+    .then((response) => response.items.map(toAssetSelectionAsset))
+    .catch(() => assetSelectionAssets);
 
-  return <AssetSelectionPage initialMarketId={getInitialMarketId(resolvedSearchParams.market)} />;
+  return (
+    <AssetSelectionPage
+      assets={assets}
+      initialMarketId={getInitialMarketId(resolvedSearchParams.market)}
+    />
+  );
 }

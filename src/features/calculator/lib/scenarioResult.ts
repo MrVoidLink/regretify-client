@@ -1,65 +1,15 @@
-import { assetSelectionAssets } from "@/features/calculator/data/assetSelection";
-import {
-  chartXFromProgress,
-  chartYAtX,
-  clampDate,
-  dateToProgress,
-  formatShortDate,
-  getDateTime,
-  timelineEndDate,
-} from "@/features/calculator/lib/scenarioTimeline";
-import { getDefaultAssetSelectionAsset } from "@/features/calculator/lib/assets";
 import type {
-  AssetSelectionAsset,
-  CalculatorScenarioAsset,
+  CalculatorAssetHistoryPoint,
   CalculatorScenarioResult,
   CalculatorScenarioTone,
 } from "@/features/calculator/types";
-
-const btcReferenceGrowthExponent = 4.08932896955264;
-
-function parseUpsidePercent(upside: string) {
-  const numeric = Number(upside.replace(/[^\d.-]/g, ""));
-
-  return Number.isFinite(numeric) ? numeric : 0;
-}
-
-function getAssetSelectionAsset(
-  asset: CalculatorScenarioAsset,
-): AssetSelectionAsset {
-  return (
-    assetSelectionAssets.find((item) => item.ticker === asset.ticker) ??
-    getDefaultAssetSelectionAsset()
-  );
-}
-
-function getAssetGrowthExponent(asset: CalculatorScenarioAsset) {
-  const baselineUpside = parseUpsidePercent(getDefaultAssetSelectionAsset().upside);
-  const assetUpside = parseUpsidePercent(getAssetSelectionAsset(asset).upside);
-  const upsideRatio = baselineUpside > 0 ? assetUpside / baselineUpside : 1;
-  const volatilityFactor = Math.min(1.35, Math.max(0.72, Math.sqrt(upsideRatio || 1)));
-
-  return btcReferenceGrowthExponent * volatilityFactor;
-}
-
-function getTimelinePriceIndex(date: Date) {
-  const x = chartXFromProgress(dateToProgress(clampDate(date)));
-  const y = chartYAtX(x);
-
-  return Math.max(1, 100 - y);
-}
-
-function getAssetPriceRatio(
-  asset: CalculatorScenarioAsset,
-  startDate: Date,
-  endDate: Date,
-) {
-  const startIndex = getTimelinePriceIndex(startDate);
-  const endIndex = getTimelinePriceIndex(endDate);
-  const exponent = getAssetGrowthExponent(asset);
-
-  return Math.pow(endIndex / startIndex, exponent);
-}
+import {
+  clampDate,
+  formatShortDate,
+  getDateTime,
+  isoDateFromDate,
+  type ScenarioTimelineModel,
+} from "@/features/calculator/lib/scenarioTimelineModel";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
@@ -99,22 +49,104 @@ function getScenarioTone(profitAmount: number): CalculatorScenarioTone {
   return "neutral";
 }
 
+function findHistoryPointForDate(
+  history: CalculatorAssetHistoryPoint[],
+  date: Date,
+) {
+  const targetDate = isoDateFromDate(date);
+  let selectedPoint = history[0] ?? null;
+
+  for (const point of history) {
+    if (point.date > targetDate) {
+      break;
+    }
+
+    selectedPoint = point;
+  }
+
+  return selectedPoint ?? history[history.length - 1] ?? null;
+}
+
+function getClosePrice(point: CalculatorAssetHistoryPoint | null) {
+  const numericValue = Number(point?.closePrice ?? "");
+  return Number.isFinite(numericValue) && numericValue > 0 ? numericValue : null;
+}
+
 export function calculateScenarioResult({
-  asset,
   amount,
   startDate,
   endDate,
+  history,
+  timeline,
 }: {
-  asset: CalculatorScenarioAsset;
   amount: number;
   startDate: Date;
   endDate: Date;
+  history: CalculatorAssetHistoryPoint[];
+  timeline: ScenarioTimelineModel;
 }): CalculatorScenarioResult {
   const investedAmount = Math.max(0, amount);
-  const safeStartDate = clampDate(startDate);
-  const safeEndDate = clampDate(endDate);
-  const priceRatio = getAssetPriceRatio(asset, safeStartDate, safeEndDate);
-  const currentValue = investedAmount * priceRatio;
+  const safeStartDate = clampDate(startDate, timeline);
+  const safeEndDate = clampDate(endDate, timeline);
+
+  if (!history.length) {
+    return {
+      tone: "neutral",
+      investedAmount,
+      investedAmountLabel: formatCurrency(investedAmount),
+      startDate: safeStartDate,
+      endDate: safeEndDate,
+      startDateLabel: formatShortDate(safeStartDate),
+      endDateLabel: formatShortDate(safeEndDate),
+      currentValue: investedAmount,
+      currentValueLabel: formatCurrency(investedAmount),
+      profitAmount: 0,
+      profitAmountLabel: "$0",
+      profitPercent: 0,
+      profitPercentLabel: "0%",
+      dailyProfit: 0,
+      dailyProfitLabel: "$0",
+      monthlyProfit: 0,
+      monthlyProfitLabel: "$0",
+      yearlyProfit: 0,
+      yearlyProfitLabel: "$0",
+      daysHeld: 1,
+      timelineEndDate: timeline.timelineEndDate,
+    };
+  }
+
+  const startPoint = findHistoryPointForDate(history, safeStartDate);
+  const endPoint = findHistoryPointForDate(history, safeEndDate);
+  const startPrice = getClosePrice(startPoint);
+  const endPrice = getClosePrice(endPoint);
+
+  if (!startPrice || !endPrice) {
+    return {
+      tone: "neutral",
+      investedAmount,
+      investedAmountLabel: formatCurrency(investedAmount),
+      startDate: safeStartDate,
+      endDate: safeEndDate,
+      startDateLabel: formatShortDate(safeStartDate),
+      endDateLabel: formatShortDate(safeEndDate),
+      currentValue: investedAmount,
+      currentValueLabel: formatCurrency(investedAmount),
+      profitAmount: 0,
+      profitAmountLabel: "$0",
+      profitPercent: 0,
+      profitPercentLabel: "0%",
+      dailyProfit: 0,
+      dailyProfitLabel: "$0",
+      monthlyProfit: 0,
+      monthlyProfitLabel: "$0",
+      yearlyProfit: 0,
+      yearlyProfitLabel: "$0",
+      daysHeld: 1,
+      timelineEndDate: timeline.timelineEndDate,
+    };
+  }
+
+  const currentValue = investedAmount * (endPrice / startPrice);
   const profitAmount = currentValue - investedAmount;
   const profitPercent =
     investedAmount > 0 ? ((currentValue - investedAmount) / investedAmount) * 100 : 0;
@@ -123,10 +155,7 @@ export function calculateScenarioResult({
     Math.round((getDateTime(safeEndDate) - getDateTime(safeStartDate)) / 86400000),
   );
   const elapsedMonths = Math.max(1, elapsedDays / 30.4375);
-  const elapsedYears = Math.max(
-    1 / 12,
-    elapsedDays / 365.25,
-  );
+  const elapsedYears = Math.max(1 / 12, elapsedDays / 365.25);
   const dailyProfit = profitAmount / elapsedDays;
   const monthlyProfit = profitAmount / elapsedMonths;
   const yearlyProfit = profitAmount / elapsedYears;
@@ -153,7 +182,7 @@ export function calculateScenarioResult({
     yearlyProfit,
     yearlyProfitLabel: formatSignedCurrency(yearlyProfit),
     daysHeld: elapsedDays,
-    timelineEndDate,
+    timelineEndDate: timeline.timelineEndDate,
   };
 }
 

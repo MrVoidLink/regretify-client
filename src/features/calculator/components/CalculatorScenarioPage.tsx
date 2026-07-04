@@ -3,11 +3,13 @@
 import {
   type KeyboardEvent,
   type PointerEvent,
+  type RefObject,
   useEffect,
   useRef,
   useState,
 } from "react";
-import { selectedScenarioAsset } from "@/features/calculator/data/calculationScenario";
+import { assetSelectionAssets } from "@/features/calculator/data/assetSelection";
+import { getDefaultCalculatorScenarioAsset } from "@/features/calculator/lib/assets";
 import { ArrowIcon } from "@/features/calculator/components/scenario/ArrowIcon";
 import {
   AssetControl,
@@ -20,54 +22,65 @@ import {
   createPendingScenarioResult,
 } from "@/features/calculator/lib/scenarioResult";
 import {
+  buildScenarioTimeline,
   chartXFromProgress,
   chartYAtX,
   clampProgress,
   dateToProgress,
   formatShortDate,
+  getDefaultScenarioDates,
   minimumRangeProgress,
   monthLabels,
   progressFromChartX,
   progressToDate,
-  scenarioChartPoints,
   shiftDatePart,
   type DatePart,
-} from "@/features/calculator/lib/scenarioTimeline";
-import type { CalculatorScenarioAsset } from "@/features/calculator/types";
+  type ScenarioTimelineModel,
+} from "@/features/calculator/lib/scenarioTimelineModel";
+import type {
+  CalculatorAssetHistoryPoint,
+  CalculatorScenarioAsset,
+} from "@/features/calculator/types";
 
 function MarketChartModule({
+  timeline,
+  isDataReady,
   startDate,
   endDate,
   onStartDateChange,
   onEndDateChange,
 }: {
+  timeline: ScenarioTimelineModel;
+  isDataReady: boolean;
   startDate: Date;
   endDate: Date;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
 }) {
   const sliderRef = useRef<HTMLDivElement>(null);
-  const safeStart = dateToProgress(startDate);
-  const safeEnd = dateToProgress(endDate);
-  const startChartX = chartXFromProgress(safeStart);
-  const endChartX = chartXFromProgress(safeEnd);
-  const chartLinePoints = scenarioChartPoints
+  const safeStart = dateToProgress(startDate, timeline);
+  const safeEnd = dateToProgress(endDate, timeline);
+  const startChartX = chartXFromProgress(safeStart, timeline);
+  const endChartX = chartXFromProgress(safeEnd, timeline);
+  const chartLinePoints = timeline.chartPoints
     .map((point) => `${point.x},${point.y}`)
     .join(" ");
   const chartAreaPoints = `${chartLinePoints} 96,100 6,100`;
+  const chartStartX = timeline.chartPoints[0]?.x ?? 6;
+  const chartEndX = timeline.chartPoints[timeline.chartPoints.length - 1]?.x ?? 96;
   const handles = [
     {
       id: "start-handle",
       label: "Start date position",
       x: startChartX,
-      y: chartYAtX(startChartX),
+      y: chartYAtX(startChartX, timeline),
       progress: safeStart,
     },
     {
       id: "end-handle",
       label: "End date position",
       x: endChartX,
-      y: chartYAtX(endChartX),
+      y: chartYAtX(endChartX, timeline),
       progress: safeEnd,
     },
   ];
@@ -82,19 +95,27 @@ function MarketChartModule({
     const bounds = slider.getBoundingClientRect();
     const xPercent = ((clientX - bounds.left) / bounds.width) * 100;
 
-    return clampProgress(progressFromChartX(xPercent));
+    return clampProgress(progressFromChartX(xPercent, timeline));
   }
 
   function updateHandlePosition(handle: "start" | "end", nextProgress: number) {
     if (handle === "start") {
-      onStartDateChange(progressToDate(Math.min(nextProgress, safeEnd - minimumRangeProgress)));
+      onStartDateChange(
+        progressToDate(Math.min(nextProgress, safeEnd - minimumRangeProgress), timeline),
+      );
       return;
     }
 
-    onEndDateChange(progressToDate(Math.max(nextProgress, safeStart + minimumRangeProgress)));
+    onEndDateChange(
+      progressToDate(Math.max(nextProgress, safeStart + minimumRangeProgress), timeline),
+    );
   }
 
   function handleSliderPointerDown(event: PointerEvent<HTMLDivElement>) {
+    if (!isDataReady) {
+      return;
+    }
+
     const nextProgress = getProgressFromPointer(event.clientX);
     const nearestHandle =
       Math.abs(nextProgress - safeStart) <= Math.abs(nextProgress - safeEnd)
@@ -108,6 +129,10 @@ function MarketChartModule({
     handle: "start" | "end",
     event: PointerEvent<HTMLButtonElement>,
   ) {
+    if (!isDataReady) {
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -118,7 +143,7 @@ function MarketChartModule({
     handle: "start" | "end",
     event: PointerEvent<HTMLButtonElement>,
   ) {
-    if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
+    if (!isDataReady || !event.currentTarget.hasPointerCapture(event.pointerId)) {
       return;
     }
 
@@ -135,6 +160,10 @@ function MarketChartModule({
     handle: "start" | "end",
     event: KeyboardEvent<HTMLButtonElement>,
   ) {
+    if (!isDataReady) {
+      return;
+    }
+
     const step = event.shiftKey ? 5 : 1;
     const direction =
       event.key === "ArrowRight" || event.key === "ArrowUp"
@@ -178,16 +207,22 @@ function MarketChartModule({
         </div>
       </div>
 
+      {!isDataReady ? (
+        <div className="mt-2 rounded-[0.8rem] border border-[color:var(--color-border-ui-subtle)] bg-[var(--color-surface-ui-muted)] px-3 py-2 text-[0.68rem] text-[var(--color-text-ui-soft)]">
+          Historical price data is still syncing for this asset. The chart will unlock as
+          soon as the first history batch is available.
+        </div>
+      ) : null}
+
       <div className="relative mt-1.5 min-h-[7.6rem] flex-1 overflow-hidden rounded-[0.8rem] bg-[linear-gradient(180deg,#ffffff_0%,#fbf9ff_100%)]">
         <div className="absolute inset-y-3 left-0 z-10 w-12 text-[0.56rem] text-[var(--color-text-ui-muted)]">
-          {[
-            { label: "$100K", top: 4 },
-            { label: "$10K", top: 30 },
-            { label: "$1K", top: 56 },
-            { label: "$100", top: 82 },
-          ].map((tick) => (
-            <span key={tick.label} className="absolute left-0" style={{ top: `${tick.top}%` }}>
-              {tick.label}
+          {["Top", "", "", "Base"].map((tick, index) => (
+            <span
+              key={`${tick}-${index}`}
+              className="absolute left-0"
+              style={{ top: `${4 + index * 26}%` }}
+            >
+              {tick}
             </span>
           ))}
         </div>
@@ -236,7 +271,12 @@ function MarketChartModule({
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={Math.round(handle.progress)}
-            className="absolute z-20 grid h-7 w-7 -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none place-items-center rounded-full border-2 border-[var(--color-brand)] bg-white shadow-[0_8px_18px_rgba(111,67,255,0.2)] outline-none transition-transform focus-visible:ring-2 focus-visible:ring-[var(--color-brand)] active:scale-105 active:cursor-grabbing"
+            aria-disabled={!isDataReady}
+            className={`absolute z-20 grid h-7 w-7 -translate-x-1/2 -translate-y-1/2 touch-none place-items-center rounded-full border-2 border-[var(--color-brand)] bg-white shadow-[0_8px_18px_rgba(111,67,255,0.2)] outline-none transition-transform focus-visible:ring-2 focus-visible:ring-[var(--color-brand)] ${
+              isDataReady
+                ? "cursor-grab active:scale-105 active:cursor-grabbing"
+                : "cursor-not-allowed opacity-60"
+            }`}
             style={{ left: `${handle.x}%`, top: `${handle.y}%` }}
             onPointerDown={(event) =>
               handlePointerDown(handle.id === "start-handle" ? "start" : "end", event)
@@ -255,7 +295,7 @@ function MarketChartModule({
         ))}
 
         <div className="absolute inset-x-9 bottom-2 flex justify-between text-[0.56rem] text-[var(--color-text-ui-muted)]">
-          {["2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"].map((year) => (
+          {timeline.yearLabels.map((year) => (
             <span key={year}>{year}</span>
           ))}
         </div>
@@ -266,7 +306,10 @@ function MarketChartModule({
         className="relative mt-1.5 h-[2rem] touch-none overflow-x-hidden overflow-y-visible"
         onPointerDown={handleSliderPointerDown}
       >
-        <div className="absolute top-2.5 h-1.5 rounded-full bg-[var(--color-brand-soft-strong)]" style={{ left: `${scenarioChartPoints[0].x}%`, right: `${100 - scenarioChartPoints[scenarioChartPoints.length - 1].x}%` }} />
+        <div
+          className="absolute top-2.5 h-1.5 rounded-full bg-[var(--color-brand-soft-strong)]"
+          style={{ left: `${chartStartX}%`, right: `${100 - chartEndX}%` }}
+        />
         <div
           className="absolute top-2.5 h-1.5 rounded-full bg-[var(--color-brand)]"
           style={{ left: `${startChartX}%`, right: `${100 - endChartX}%` }}
@@ -281,7 +324,12 @@ function MarketChartModule({
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={Math.round(handle.progress)}
-            className="absolute -top-1 grid h-8 w-8 -translate-x-1/2 cursor-grab touch-none place-items-center rounded-full border-2 border-[var(--color-brand)] bg-white shadow-[0_10px_20px_rgba(111,67,255,0.2)] outline-none transition-transform focus-visible:ring-2 focus-visible:ring-[var(--color-brand)] active:scale-105 active:cursor-grabbing"
+            aria-disabled={!isDataReady}
+            className={`absolute -top-1 grid h-8 w-8 -translate-x-1/2 touch-none place-items-center rounded-full border-2 border-[var(--color-brand)] bg-white shadow-[0_10px_20px_rgba(111,67,255,0.2)] outline-none transition-transform focus-visible:ring-2 focus-visible:ring-[var(--color-brand)] ${
+              isDataReady
+                ? "cursor-grab active:scale-105 active:cursor-grabbing"
+                : "cursor-not-allowed opacity-60"
+            }`}
             style={{ left: `${handle.x}%` }}
             onPointerDown={(event) =>
               handlePointerDown(handle.id === "start-handle" ? "start" : "end", event)
@@ -312,10 +360,14 @@ function MarketChartModule({
 }
 
 function DateWheel({
+  timeline,
+  isDataReady,
   title,
   date,
   onDateChange,
 }: {
+  timeline: ScenarioTimelineModel;
+  isDataReady: boolean;
   title: string;
   date: Date;
   onDateChange: (date: Date) => void;
@@ -323,10 +375,10 @@ function DateWheel({
   const dayItems = [-2, -1, 0, 1, 2].map((offset) => ({
     id: `day-${offset}`,
     offset,
-    label: String(shiftDatePart(date, "day", offset).getDate()),
+    label: String(shiftDatePart(date, "day", offset, timeline).getDate()),
   }));
   const monthItems = [-2, -1, 0, 1, 2].map((offset) => {
-    const itemDate = shiftDatePart(date, "month", offset);
+    const itemDate = shiftDatePart(date, "month", offset, timeline);
 
     return {
       id: `month-${offset}`,
@@ -337,21 +389,25 @@ function DateWheel({
   const yearItems = [-2, -1, 0, 1, 2].map((offset) => ({
     id: `year-${offset}`,
     offset,
-    label: String(shiftDatePart(date, "year", offset).getFullYear()),
+    label: String(shiftDatePart(date, "year", offset, timeline).getFullYear()),
   }));
   const dayWheelRef = useRef<HTMLDivElement>(null);
   const monthWheelRef = useRef<HTMLDivElement>(null);
   const yearWheelRef = useRef<HTMLDivElement>(null);
 
   function updateDatePart(part: DatePart, offset: number) {
-    if (offset === 0) {
+    if (!isDataReady || offset === 0) {
       return;
     }
 
-    onDateChange(shiftDatePart(date, part, offset));
+    onDateChange(shiftDatePart(date, part, offset, timeline));
   }
 
   useEffect(() => {
+    if (!isDataReady) {
+      return;
+    }
+
     const wheelBindings = [
       { ref: dayWheelRef, part: "day" as const },
       { ref: monthWheelRef, part: "month" as const },
@@ -369,7 +425,9 @@ function DateWheel({
         const handleWheelEvent = (event: WheelEvent) => {
           event.preventDefault();
           event.stopPropagation();
-          onDateChange(shiftDatePart(date, part, event.deltaY > 0 ? 1 : -1));
+          onDateChange(
+            shiftDatePart(date, part, event.deltaY > 0 ? 1 : -1, timeline),
+          );
         };
 
         element.addEventListener("wheel", handleWheelEvent, { passive: false });
@@ -383,26 +441,29 @@ function DateWheel({
     return () => {
       cleanups.forEach((cleanup) => cleanup());
     };
-  }, [date, onDateChange]);
+  }, [date, isDataReady, onDateChange, timeline]);
 
   function renderWheelColumn(
-    ref: React.RefObject<HTMLDivElement | null>,
+    ref: RefObject<HTMLDivElement | null>,
     part: DatePart,
     items: Array<{ id: string; offset: number; label: string }>,
   ) {
     return (
       <div
         ref={ref}
-        className="grid py-1 overscroll-contain select-none touch-none"
+        className={`grid py-1 overscroll-contain select-none touch-none ${
+          isDataReady ? "" : "opacity-60"
+        }`}
       >
         {items.map((item) => (
           <button
             key={item.id}
             type="button"
+            disabled={!isDataReady}
             onClick={() => updateDatePart(part, item.offset)}
             className={`relative z-10 grid min-h-[1rem] place-items-center ${
               item.offset === 0 ? "font-semibold text-[var(--color-brand)]" : ""
-            }`}
+            } ${isDataReady ? "" : "cursor-not-allowed"}`}
           >
             {item.label}
           </button>
@@ -428,11 +489,15 @@ function DateWheel({
 }
 
 function DateWheelModule({
+  timeline,
+  isDataReady,
   startDate,
   endDate,
   onStartDateChange,
   onEndDateChange,
 }: {
+  timeline: ScenarioTimelineModel;
+  isDataReady: boolean;
   startDate: Date;
   endDate: Date;
   onStartDateChange: (date: Date) => void;
@@ -440,7 +505,13 @@ function DateWheelModule({
 }) {
   return (
     <section className="mt-2.5 grid gap-2.5 md:grid-cols-[1fr_auto_1fr] md:items-center">
-      <DateWheel title="Start Date" date={startDate} onDateChange={onStartDateChange} />
+      <DateWheel
+        timeline={timeline}
+        isDataReady={isDataReady}
+        title="Start Date"
+        date={startDate}
+        onDateChange={onStartDateChange}
+      />
       <button
         type="button"
         aria-label="Swap dates"
@@ -462,13 +533,21 @@ function DateWheelModule({
           <path d="m9 10-3 3 3 3" />
         </svg>
       </button>
-      <DateWheel title="End Date" date={endDate} onDateChange={onEndDateChange} />
+      <DateWheel
+        timeline={timeline}
+        isDataReady={isDataReady}
+        title="End Date"
+        date={endDate}
+        onDateChange={onEndDateChange}
+      />
     </section>
   );
 }
 
 function LeftScenarioBuilder({
   asset,
+  timeline,
+  isDataReady,
   amount,
   onAmountChange,
   startDate,
@@ -478,6 +557,8 @@ function LeftScenarioBuilder({
   onCalculate,
 }: {
   asset: CalculatorScenarioAsset;
+  timeline: ScenarioTimelineModel;
+  isDataReady: boolean;
   amount: string;
   onAmountChange: (amount: string) => void;
   startDate: Date;
@@ -487,20 +568,26 @@ function LeftScenarioBuilder({
   onCalculate: () => void;
 }) {
   function handleStartDateChange(nextDate: Date) {
-    const nextProgress = dateToProgress(nextDate);
-    const endProgress = dateToProgress(endDate);
+    const nextProgress = dateToProgress(nextDate, timeline);
+    const endProgress = dateToProgress(endDate, timeline);
 
     onStartDateChange(
-      progressToDate(Math.min(nextProgress, endProgress - minimumRangeProgress)),
+      progressToDate(
+        Math.min(nextProgress, endProgress - minimumRangeProgress),
+        timeline,
+      ),
     );
   }
 
   function handleEndDateChange(nextDate: Date) {
-    const nextProgress = dateToProgress(nextDate);
-    const startProgress = dateToProgress(startDate);
+    const nextProgress = dateToProgress(nextDate, timeline);
+    const startProgress = dateToProgress(startDate, timeline);
 
     onEndDateChange(
-      progressToDate(Math.max(nextProgress, startProgress + minimumRangeProgress)),
+      progressToDate(
+        Math.max(nextProgress, startProgress + minimumRangeProgress),
+        timeline,
+      ),
     );
   }
 
@@ -509,7 +596,7 @@ function LeftScenarioBuilder({
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="type-title flex items-center gap-2 text-[1.24rem] font-semibold text-zinc-950">
-            <span className="text-[var(--color-brand)]">✦</span>
+            <span className="text-[var(--color-brand)]">*</span>
             Build your regret scenario
           </h1>
           <p className="mt-0.5 text-[0.78rem] leading-5 text-[var(--color-text-ui-soft)]">
@@ -522,12 +609,16 @@ function LeftScenarioBuilder({
       <div className="mt-2.5 flex min-h-0 flex-1 flex-col">
         <InvestmentControls amount={amount} onAmountChange={onAmountChange} />
         <MarketChartModule
+          timeline={timeline}
+          isDataReady={isDataReady}
           startDate={startDate}
           endDate={endDate}
           onStartDateChange={handleStartDateChange}
           onEndDateChange={handleEndDateChange}
         />
         <DateWheelModule
+          timeline={timeline}
+          isDataReady={isDataReady}
           startDate={startDate}
           endDate={endDate}
           onStartDateChange={handleStartDateChange}
@@ -537,38 +628,53 @@ function LeftScenarioBuilder({
 
       <button
         type="button"
+        disabled={!isDataReady}
         onClick={onCalculate}
-        className="mt-2.5 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-[0.85rem] bg-[linear-gradient(180deg,var(--color-brand)_0%,var(--color-brand-strong)_100%)] px-5 text-[0.84rem] font-semibold text-white shadow-[0_14px_30px_rgba(111,67,255,0.24)]"
+        className={`mt-2.5 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-[0.85rem] px-5 text-[0.84rem] font-semibold text-white ${
+          isDataReady
+            ? "bg-[linear-gradient(180deg,var(--color-brand)_0%,var(--color-brand-strong)_100%)] shadow-[0_14px_30px_rgba(111,67,255,0.24)]"
+            : "cursor-not-allowed bg-zinc-300 shadow-none"
+        }`}
       >
         <span>Calculate Your Regret</span>
         <ArrowIcon />
       </button>
       <p className="mt-1 text-center text-[0.64rem] text-[var(--color-text-ui-muted)]">
-        Past performance, pure regret.
+        {isDataReady
+          ? "Past performance, pure regret."
+          : "Waiting for historical price sync."}
       </p>
     </section>
   );
 }
 
 export function CalculatorScenarioPage({
-  asset = selectedScenarioAsset,
+  asset = getDefaultCalculatorScenarioAsset(assetSelectionAssets),
+  history = [],
 }: {
   asset?: CalculatorScenarioAsset;
+  history?: CalculatorAssetHistoryPoint[];
 }) {
   const previewPanelRef = useRef<HTMLDivElement>(null);
+  const timeline = buildScenarioTimeline(history);
+  const initialDates = getDefaultScenarioDates(timeline);
+  const isDataReady = history.length > 1;
   const [amount, setAmount] = useState("1000");
-  const [startDate, setStartDate] = useState(() => new Date(2020, 3, 12));
-  const [endDate, setEndDate] = useState(() => new Date(2024, 4, 12));
+  const [startDate, setStartDate] = useState(() => initialDates.startDate);
+  const [endDate, setEndDate] = useState(() => initialDates.endDate);
   const [hasCalculated, setHasCalculated] = useState(false);
+
   const scenarioResult = calculateScenarioResult({
-    asset,
     amount: Number(amount || "0"),
     startDate,
     endDate,
+    history,
+    timeline,
   });
-  const previewResult = hasCalculated
-    ? scenarioResult
-    : createPendingScenarioResult(scenarioResult);
+  const previewResult =
+    hasCalculated && isDataReady
+      ? scenarioResult
+      : createPendingScenarioResult(scenarioResult);
 
   function handleAmountChange(nextAmount: string) {
     setHasCalculated(false);
@@ -601,6 +707,10 @@ export function CalculatorScenarioPage({
   }
 
   function handleCalculate() {
+    if (!isDataReady) {
+      return;
+    }
+
     setHasCalculated(true);
     scrollToPreviewPanel();
   }
@@ -613,6 +723,8 @@ export function CalculatorScenarioPage({
             <ScenarioTopBar asset={asset} />
             <LeftScenarioBuilder
               asset={asset}
+              timeline={timeline}
+              isDataReady={isDataReady}
               amount={amount}
               onAmountChange={handleAmountChange}
               startDate={startDate}

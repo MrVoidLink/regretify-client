@@ -12,7 +12,7 @@ import {
   getAssetSlug,
   getDefaultAssetSelectionAsset,
 } from "@/features/calculator/lib/assets";
-import type { CalculatorMarketId } from "@/features/calculator/types";
+import type { AssetSelectionAsset, CalculatorMarketId } from "@/features/calculator/types";
 
 function BackButton() {
   return (
@@ -234,15 +234,18 @@ function MobileBottomCta({ scenarioHref }: { scenarioHref: string }) {
 }
 
 export function AssetSelectionPage({
+  assets,
   initialMarketId,
 }: {
+  assets: AssetSelectionAsset[];
   initialMarketId: CalculatorMarketId;
 }) {
   const [selectedAssetSlug, setSelectedAssetSlug] = useState(() =>
-    getAssetSlug(getDefaultAssetSelectionAsset()),
+    getAssetSlug(getDefaultAssetSelectionAsset(assets)),
   );
   const selectedAsset =
-    getAssetSelectionAssetBySlug(selectedAssetSlug) ?? getDefaultAssetSelectionAsset();
+    getAssetSelectionAssetBySlug(selectedAssetSlug, assets) ??
+    getDefaultAssetSelectionAsset(assets);
   const scenarioHref = getAssetRoute(selectedAsset);
   const selectedMarket =
     calculatorMarkets.find((market) => market.id === initialMarketId) ?? calculatorMarkets[0];
@@ -265,6 +268,7 @@ export function AssetSelectionPage({
             <HeroRow selectedMarketId={selectedMarket.id} />
             <AssetSelectionControls />
             <AssetSelectionList
+              assets={assets}
               selectedAssetSlug={selectedAssetSlug}
               onAssetSelect={setSelectedAssetSlug}
             />

@@ -22,13 +22,17 @@ export type CalculatorMarket = {
 };
 
 export type AssetSelectionAsset = {
+  slug?: string;
   rank: number;
   name: string;
   ticker: string;
-  insight: string;
-  detail: string;
-  upside: string;
+  currentPrice: string;
+  dayChangePercent: string;
+  upside?: string;
   isSelected: boolean;
+  currentPriceValue?: number | null;
+  dayChangePercentValue?: number | null;
+  listedAt?: string | null;
 };
 
 export type CalculatorScenarioStep = {
@@ -39,11 +43,26 @@ export type CalculatorScenarioStep = {
 };
 
 export type CalculatorScenarioAsset = {
+  slug: string;
   name: string;
   ticker: string;
   marketLabel: string;
   mark: string;
   markClassName: string;
+  listedAt: string | null;
+  currentPriceValue?: number | null;
+};
+
+export type CalculatorAssetHistoryPoint = {
+  date: string;
+  openPrice: string;
+  highPrice: string;
+  lowPrice: string;
+  closePrice: string;
+  volume: string | null;
+  quoteVolume: string | null;
+  tradeCount: number | null;
+  source: string;
 };
 
 export type InvestmentPreset = {

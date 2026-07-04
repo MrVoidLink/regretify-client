@@ -14,7 +14,18 @@ const scenarioAssetMarkClasses: Record<string, string> = {
   PEPE: "bg-[linear-gradient(180deg,#86efac_0%,#22c55e_100%)] text-white shadow-[0_10px_22px_rgba(34,197,94,0.18)]",
 };
 
-export function getAssetSlug(asset: Pick<AssetSelectionAsset, "name">) {
+export function getScenarioAssetMarkClassName(ticker: string) {
+  return (
+    scenarioAssetMarkClasses[ticker] ??
+    "bg-[linear-gradient(180deg,#d4d4d8_0%,#71717a_100%)] text-white shadow-[0_10px_22px_rgba(24,24,27,0.12)]"
+  );
+}
+
+export function getAssetSlug(asset: Pick<AssetSelectionAsset, "name" | "slug">) {
+  if (asset.slug?.trim()) {
+    return asset.slug.trim().toLowerCase();
+  }
+
   return asset.name
     .toLowerCase()
     .replace(/&/g, "and")
@@ -22,46 +33,55 @@ export function getAssetSlug(asset: Pick<AssetSelectionAsset, "name">) {
     .replace(/^-|-$/g, "");
 }
 
-export function getAssetRoute(asset: Pick<AssetSelectionAsset, "name">) {
+export function getAssetRoute(asset: Pick<AssetSelectionAsset, "name" | "slug">) {
   return `/${getAssetSlug(asset)}`;
 }
 
-export function getAssetSelectionParams() {
-  return assetSelectionAssets.map((asset) => ({ asset: getAssetSlug(asset) }));
+export function getAssetSelectionParams(assets: AssetSelectionAsset[] = assetSelectionAssets) {
+  return assets.map((asset) => ({ asset: getAssetSlug(asset) }));
 }
 
-export function getAssetSelectionAssetBySlug(slug: string) {
-  return assetSelectionAssets.find((asset) => getAssetSlug(asset) === slug) ?? null;
+export function getAssetSelectionAssetBySlug(
+  slug: string,
+  assets: AssetSelectionAsset[] = assetSelectionAssets,
+) {
+  return assets.find((asset) => getAssetSlug(asset) === slug) ?? null;
 }
 
-export function getDefaultAssetSelectionAsset() {
-  return (
-    assetSelectionAssets.find((asset) => asset.isSelected) ?? assetSelectionAssets[0]
-  );
+export function getDefaultAssetSelectionAsset(
+  assets: AssetSelectionAsset[] = assetSelectionAssets,
+) {
+  return assets.find((asset) => asset.isSelected) ?? assets[0];
 }
 
 export function toCalculatorScenarioAsset(
   asset: AssetSelectionAsset,
 ): CalculatorScenarioAsset {
   return {
+    slug: getAssetSlug(asset),
     name: asset.name,
     ticker: asset.ticker,
     marketLabel: "Crypto",
     mark: asset.name.charAt(0),
-    markClassName:
-      scenarioAssetMarkClasses[asset.ticker] ??
-      "bg-[linear-gradient(180deg,#d4d4d8_0%,#71717a_100%)] text-white shadow-[0_10px_22px_rgba(24,24,27,0.12)]",
+    markClassName: getScenarioAssetMarkClassName(asset.ticker),
+    listedAt: asset.listedAt ?? null,
+    currentPriceValue: asset.currentPriceValue ?? null,
   };
 }
 
-export function getCalculatorScenarioAssetBySlug(slug: string) {
-  const asset = getAssetSelectionAssetBySlug(slug);
+export function getCalculatorScenarioAssetBySlug(
+  slug: string,
+  assets: AssetSelectionAsset[] = assetSelectionAssets,
+) {
+  const asset = getAssetSelectionAssetBySlug(slug, assets);
 
   return asset ? toCalculatorScenarioAsset(asset) : null;
 }
 
-export function getDefaultCalculatorScenarioAsset() {
-  return toCalculatorScenarioAsset(getDefaultAssetSelectionAsset());
+export function getDefaultCalculatorScenarioAsset(
+  assets: AssetSelectionAsset[] = assetSelectionAssets,
+) {
+  return toCalculatorScenarioAsset(getDefaultAssetSelectionAsset(assets));
 }
 
 export function getCalculatorScenarioSteps(

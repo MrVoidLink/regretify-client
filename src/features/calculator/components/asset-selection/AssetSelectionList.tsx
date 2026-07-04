@@ -1,67 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { assetSelectionAssets } from "@/features/calculator/data/assetSelection";
 import { getAssetSlug } from "@/features/calculator/lib/assets";
+import type { AssetSelectionAsset } from "@/features/calculator/types";
 
-function InsightIcon({ rank }: { rank: number }) {
-  if (rank % 5 === 0) {
-    return (
-      <span className="grid h-5 w-5 place-items-center rounded-full bg-blue-50 text-blue-500">
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 20 20"
-          className="h-3 w-3"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.9"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="m4 13 4-4 3 3 5-6" />
-          <path d="M12 6h4v4" />
-        </svg>
-      </span>
-    );
-  }
-
-  if (rank % 3 === 0) {
-    return (
-      <span className="grid h-5 w-5 place-items-center rounded-full bg-violet-50 text-violet-500">
-        <svg aria-hidden="true" viewBox="0 0 20 20" className="h-3 w-3" fill="currentColor">
-          <path d="m11.3 2.5-1.2 5.4 4.7 1-7 8.6 1.2-5.5-4.6-1 6.9-8.5Z" />
-        </svg>
-      </span>
-    );
-  }
-
-  if (rank % 2 === 0) {
-    return (
-      <span className="grid h-5 w-5 place-items-center rounded-full bg-pink-50 text-pink-500">
-        <svg aria-hidden="true" viewBox="0 0 20 20" className="h-3 w-3" fill="currentColor">
-          <path d="M10 16.2 4.2 10.8A3.7 3.7 0 0 1 9.5 5.7L10 6.3l.5-.6a3.7 3.7 0 0 1 5.3 5.1L10 16.2Z" />
-        </svg>
-      </span>
-    );
-  }
-
-  return (
-    <span className="grid h-5 w-5 place-items-center rounded-full bg-[var(--color-brand-soft)] text-[var(--color-brand)]">
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 20 20"
-        className="h-3 w-3"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="m4 13 4-4 3 3 5-6" />
-        <path d="M12 6h4v4" />
-      </svg>
-    </span>
-  );
+function getDayChangeTone(changePercent: string) {
+  return changePercent.trim().startsWith("-")
+    ? "text-rose-600"
+    : "text-emerald-600";
 }
 
 function AssetLogo({ ticker, name }: { ticker: string; name: string }) {
@@ -210,9 +156,11 @@ function AssetLogo({ ticker, name }: { ticker: string; name: string }) {
 }
 
 export function AssetSelectionList({
+  assets,
   selectedAssetSlug,
   onAssetSelect,
 }: {
+  assets: AssetSelectionAsset[];
   selectedAssetSlug: string;
   onAssetSelect: (slug: string) => void;
 }) {
@@ -223,9 +171,9 @@ export function AssetSelectionList({
   const [hasScrolledAfterExpand, setHasScrolledAfterExpand] = useState(false);
   const loadMoreTriggerRef = useRef<HTMLDivElement | null>(null);
   const autoLoadStartScrollYRef = useRef(0);
-  const visibleAssets = assetSelectionAssets.slice(0, visibleCount);
-  const hasMoreAssets = visibleCount < assetSelectionAssets.length;
-  const nextVisibleCount = Math.min(visibleCount + increment, assetSelectionAssets.length);
+  const visibleAssets = assets.slice(0, visibleCount);
+  const hasMoreAssets = visibleCount < assets.length;
+  const nextVisibleCount = Math.min(visibleCount + increment, assets.length);
 
   useEffect(() => {
     if (isAutoLoadEnabled && !hasScrolledAfterExpand) {
@@ -259,7 +207,7 @@ export function AssetSelectionList({
           return;
         }
 
-        setVisibleCount((current) => Math.min(current + increment, assetSelectionAssets.length));
+        setVisibleCount((current) => Math.min(current + increment, assets.length));
       },
       { root: null, threshold: 1 },
     );
@@ -267,7 +215,7 @@ export function AssetSelectionList({
     observer.observe(loadMoreTriggerRef.current);
 
     return () => observer.disconnect();
-  }, [hasMoreAssets, hasScrolledAfterExpand, increment, isAutoLoadEnabled]);
+  }, [assets.length, hasMoreAssets, hasScrolledAfterExpand, increment, isAutoLoadEnabled]);
 
   return (
     <section className="rounded-[1rem] border border-[color:var(--color-border-ui-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(249,246,255,0.9)_100%)] p-1 shadow-[0_16px_32px_rgba(24,24,27,0.03)] max-[389px]:p-0.75 md:p-1.5">
@@ -278,8 +226,8 @@ export function AssetSelectionList({
 
           return (
             <label
-              key={asset.ticker}
-              className={`grid cursor-pointer grid-cols-[0.8rem_2rem_minmax(0,1fr)_3.9rem_1.3rem] items-center gap-x-2.5 rounded-[0.85rem] border px-2.5 py-1.25 transition-all max-[389px]:grid-cols-[0.7rem_1.8rem_minmax(0,1fr)_3.45rem_1.15rem] max-[389px]:gap-x-2 max-[389px]:rounded-[0.78rem] max-[389px]:px-2 max-[389px]:py-1 md:grid-cols-[1rem_2rem_10.9rem_minmax(0,1fr)_7rem_1.5rem] md:gap-x-4 md:rounded-[0.9rem] md:px-3 md:py-2 ${
+              key={asset.slug ?? asset.ticker}
+              className={`grid cursor-pointer grid-cols-[0.8rem_2rem_minmax(0,1fr)_4.65rem_1.3rem] items-center gap-x-2.5 rounded-[0.85rem] border px-2.5 py-1.25 transition-all max-[389px]:grid-cols-[0.7rem_1.8rem_minmax(0,1fr)_4.15rem_1.15rem] max-[389px]:gap-x-2 max-[389px]:rounded-[0.78rem] max-[389px]:px-2 max-[389px]:py-1 md:grid-cols-[1rem_2rem_minmax(0,1.45fr)_minmax(7.25rem,0.9fr)_minmax(6.5rem,0.85fr)_1.5rem] md:gap-x-4 md:rounded-[0.9rem] md:px-3 md:py-2 ${
                 isSelected
                 ? "border-[color:var(--color-brand-border)] bg-white shadow-[0_10px_22px_rgba(92,44,233,0.08)]"
                 : "border-transparent bg-white/62 hover:border-[color:var(--color-border-ui-subtle)] hover:bg-white"
@@ -303,11 +251,15 @@ export function AssetSelectionList({
             </div>
 
             <div className="text-left md:hidden">
-              <div className="text-[0.72rem] font-semibold tracking-[-0.03em] text-emerald-600 max-[389px]:text-[0.64rem]">
-                {asset.upside}
+              <div className="text-[0.69rem] font-semibold tracking-[-0.03em] text-zinc-950 max-[389px]:text-[0.62rem]">
+                {asset.currentPrice}
               </div>
-              <div className="text-[0.58rem] leading-3.5 text-zinc-500 max-[389px]:text-[0.52rem] max-[389px]:leading-3">
-                You could&apos;ve grown more
+              <div
+                className={`text-[0.58rem] leading-3.5 max-[389px]:text-[0.52rem] max-[389px]:leading-3 ${getDayChangeTone(
+                  asset.dayChangePercent,
+                )}`}
+              >
+                24h {asset.dayChangePercent}
               </div>
             </div>
 
@@ -320,23 +272,22 @@ export function AssetSelectionList({
               </span>
             </div>
 
-            <div className="hidden min-w-0 md:block md:justify-self-center md:w-[11.5rem]">
-              <div className="flex items-center gap-1.5 text-left">
-                <InsightIcon rank={asset.rank} />
-                <div className="min-w-0 text-left">
-                  <div className="truncate text-[0.72rem] font-medium text-[var(--color-text-ui-soft)]">
-                    {asset.insight}
-                  </div>
-                  <div className="truncate text-[0.66rem] text-[var(--color-text-ui-muted)]">{asset.detail}</div>
-                </div>
+            <div className="hidden text-left md:block md:justify-self-center md:w-full md:max-w-[8.25rem]">
+              <div className="text-[0.78rem] font-semibold tracking-[-0.03em] text-zinc-950">
+                {asset.currentPrice}
               </div>
+              <div className="text-[0.64rem] text-[var(--color-text-ui-muted)]">Current price</div>
             </div>
 
-            <div className="hidden text-left md:block md:text-right">
-              <div className="text-[0.78rem] font-semibold tracking-[-0.03em] text-emerald-600">
-                {asset.upside}
+            <div className="hidden text-left md:block md:justify-self-end md:w-full md:max-w-[7rem] md:text-right">
+              <div
+                className={`text-[0.78rem] font-semibold tracking-[-0.03em] ${getDayChangeTone(
+                  asset.dayChangePercent,
+                )}`}
+              >
+                {asset.dayChangePercent}
               </div>
-              <div className="text-[0.64rem] text-[var(--color-text-ui-muted)]">Potential upside</div>
+              <div className="text-[0.64rem] text-[var(--color-text-ui-muted)]">24h move</div>
             </div>
 
             <div className="flex items-center justify-end">
