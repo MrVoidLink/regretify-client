@@ -122,6 +122,8 @@ function MarketChartModule({
       x: startChartX,
       y: chartYAtX(startChartX, timeline),
       progress: safeStart,
+      priceLabelClassName:
+        "left-[calc(100%-0.1rem)] sm:left-[calc(100%-0.1rem)]",
       priceLabel: formatChartPriceLabel(
         findHistoryPointForDate(history, startDate)?.closePrice ?? null,
       ),
@@ -132,6 +134,8 @@ function MarketChartModule({
       x: endChartX,
       y: chartYAtX(endChartX, timeline),
       progress: safeEnd,
+      priceLabelClassName:
+        "right-[calc(100%-0.1rem)] sm:right-[calc(100%-0.1rem)]",
       priceLabel: formatChartPriceLabel(
         findHistoryPointForDate(history, endDate)?.closePrice ?? null,
       ),
@@ -273,7 +277,7 @@ function MarketChartModule({
         </div>
       ) : null}
 
-      <div className="relative mt-3.5 min-h-[8.3rem] flex-1 overflow-visible rounded-[0.8rem] bg-[linear-gradient(180deg,#ffffff_0%,#fbf9ff_100%)]">
+      <div className="relative mt-3.5 min-h-[8.3rem] flex-1 overflow-x-clip overflow-y-visible rounded-[0.8rem] bg-[linear-gradient(180deg,#ffffff_0%,#fbf9ff_100%)]">
         <div className="absolute inset-y-3 left-0 z-10 w-16 pr-2 text-right text-[0.56rem] text-[var(--color-text-ui-muted)]">
           {timeline.priceAxisLabels.map((tick, index) => (
             <span
@@ -335,7 +339,9 @@ function MarketChartModule({
             className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
             style={{ left: `${handle.x}%`, top: `${handle.y}%` }}
           >
-            <div className="pointer-events-none absolute bottom-[calc(100%+0.38rem)] left-[calc(100%-0.1rem)] whitespace-nowrap rounded-full border border-[color:var(--color-brand-border)] bg-white/96 px-2 py-0.5 text-[0.58rem] font-semibold text-[var(--color-brand-strong)] shadow-[0_10px_18px_rgba(111,67,255,0.14)]">
+            <div
+              className={`pointer-events-none absolute bottom-[calc(100%+0.38rem)] whitespace-nowrap rounded-full border border-[color:var(--color-brand-border)] bg-white/96 px-2 py-0.5 text-[0.58rem] font-semibold text-[var(--color-brand-strong)] shadow-[0_10px_18px_rgba(111,67,255,0.14)] ${handle.priceLabelClassName}`}
+            >
               {handle.priceLabel}
             </div>
             <button

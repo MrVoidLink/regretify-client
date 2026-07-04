@@ -20,7 +20,7 @@ export default function RootLayout({
       lang="en"
       className={`${uiSans.variable} ${uiMono.variable} h-full antialiased`}
     >
-      <body className="min-h-screen bg-white text-zinc-950">
+      <body className="min-h-screen overflow-x-clip bg-white text-zinc-950">
         <Header />
         <div className="flex min-h-screen flex-col">
           <div className="flex-1 pt-16 md:pt-20 lg:pt-18">{children}</div>
