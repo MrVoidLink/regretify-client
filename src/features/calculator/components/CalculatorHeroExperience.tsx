@@ -444,7 +444,7 @@ export function CalculatorHeroExperience() {
           </div>
         </div>
 
-        <div className="mobile-stage-shell relative order-1 h-full rounded-[1.35rem] p-2.5 sm:rounded-[1.75rem] sm:p-5 md:rounded-[1.85rem] md:p-4 lg:order-2 lg:min-h-[clamp(42rem,calc(100dvh-7.75rem),56rem)] lg:p-0 min-[1800px]:min-h-[clamp(46rem,calc(100dvh-8rem),62rem)]">
+        <div className="mobile-stage-shell relative order-1 h-full rounded-[1.35rem] p-2.5 sm:rounded-[1.75rem] sm:p-5 md:rounded-[1.85rem] md:p-4 lg:order-2 lg:h-[calc(100dvh-7.75rem)] lg:min-h-0 lg:p-0 min-[1800px]:h-[calc(100dvh-8rem)]">
           <MiniGameStage
             accentColor={selectedMarket.accentColor}
             onTelemetryChange={setMiniGameTelemetry}
