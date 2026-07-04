@@ -23,13 +23,29 @@ export const monthLabels = [
 ] as const;
 
 export type DatePart = "day" | "month" | "year";
+export type ScenarioRangePresetId = "1Y" | "2Y" | "3Y" | "5Y" | "ALL";
+
+export type ScenarioRangePreset = {
+  id: ScenarioRangePresetId;
+  label: ScenarioRangePresetId;
+  years: number | null;
+};
 
 export type ScenarioTimelineModel = {
   chartPoints: readonly CalculatorScenarioChartPoint[];
   timelineStartDate: Date;
   timelineEndDate: Date;
   yearLabels: string[];
+  priceAxisLabels: string[];
 };
+
+const scenarioRangePresets: readonly ScenarioRangePreset[] = [
+  { id: "1Y", label: "1Y", years: 1 },
+  { id: "2Y", label: "2Y", years: 2 },
+  { id: "3Y", label: "3Y", years: 3 },
+  { id: "5Y", label: "5Y", years: 5 },
+  { id: "ALL", label: "ALL", years: null },
+] as const;
 
 const fallbackChartPoints: readonly CalculatorScenarioChartPoint[] = [
   { x: 6, y: 79 },
@@ -93,6 +109,41 @@ function buildYearLabels(startDate: Date, endDate: Date) {
   });
 }
 
+function formatPriceAxisLabel(value: number) {
+  if (!Number.isFinite(value) || value <= 0) {
+    return "--";
+  }
+
+  const maximumFractionDigits =
+    value >= 1000 ? 0 : value >= 1 ? 2 : value >= 0.01 ? 4 : 6;
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits,
+  }).format(value);
+}
+
+function buildPriceAxisLabels(minPrice: number, maxPrice: number) {
+  if (!Number.isFinite(minPrice) || !Number.isFinite(maxPrice) || minPrice <= 0 || maxPrice <= 0) {
+    return ["--", "", "", "--"];
+  }
+
+  if (Math.abs(maxPrice - minPrice) < 0.0000001) {
+    const label = formatPriceAxisLabel(maxPrice);
+    return [label, "", "", label];
+  }
+
+  const minLog = Math.log(minPrice);
+  const maxLog = Math.log(maxPrice);
+  const logRange = maxLog - minLog;
+
+  return Array.from({ length: 4 }, (_, index) => {
+    const ratio = index / 3;
+    return formatPriceAxisLabel(Math.exp(maxLog - ratio * logRange));
+  });
+}
+
 export function buildScenarioTimeline(history: CalculatorAssetHistoryPoint[]) {
   if (!history.length) {
     return {
@@ -100,11 +151,12 @@ export function buildScenarioTimeline(history: CalculatorAssetHistoryPoint[]) {
       timelineStartDate: new Date(2016, 0, 1),
       timelineEndDate: new Date(2025, 11, 31),
       yearLabels: ["2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"],
+      priceAxisLabels: ["--", "", "", "--"],
     } satisfies ScenarioTimelineModel;
   }
 
   const sampledHistory = sampleHistory(history, Math.min(15, history.length));
-  const closePrices = sampledHistory
+  const closePrices = history
     .map((point) => Number(point.closePrice))
     .filter((value) => Number.isFinite(value) && value > 0);
 
@@ -137,6 +189,7 @@ export function buildScenarioTimeline(history: CalculatorAssetHistoryPoint[]) {
     timelineStartDate,
     timelineEndDate,
     yearLabels: buildYearLabels(timelineStartDate, timelineEndDate),
+    priceAxisLabels: buildPriceAxisLabels(Math.min(...closePrices), Math.max(...closePrices)),
   } satisfies ScenarioTimelineModel;
 }
 
@@ -257,6 +310,76 @@ export function getDefaultScenarioDates(timeline: ScenarioTimelineModel) {
     startDate: clampDate(startCandidate, timeline),
     endDate,
   };
+}
+
+export function getAvailableScenarioRangePresets(timeline: ScenarioTimelineModel) {
+  const totalDays = Math.max(
+    1,
+    Math.round(
+      (getDateTime(timeline.timelineEndDate) - getDateTime(timeline.timelineStartDate)) / 86400000,
+    ),
+  );
+
+  return scenarioRangePresets.filter((preset) => {
+    if (preset.years === null) {
+      return true;
+    }
+
+    return totalDays >= preset.years * 365 - 30;
+  });
+}
+
+export function getScenarioDatesForRangePreset(
+  presetId: ScenarioRangePresetId,
+  timeline: ScenarioTimelineModel,
+) {
+  const endDate = timeline.timelineEndDate;
+
+  if (presetId === "ALL") {
+    return {
+      startDate: timeline.timelineStartDate,
+      endDate,
+    };
+  }
+
+  const preset = scenarioRangePresets.find((item) => item.id === presetId);
+
+  if (!preset?.years) {
+    return {
+      startDate: timeline.timelineStartDate,
+      endDate,
+    };
+  }
+
+  return {
+    startDate: clampDate(
+      new Date(endDate.getFullYear() - preset.years, endDate.getMonth(), endDate.getDate()),
+      timeline,
+    ),
+    endDate,
+  };
+}
+
+export function getActiveScenarioRangePresetId(
+  startDate: Date,
+  endDate: Date,
+  timeline: ScenarioTimelineModel,
+) {
+  if (getDateTime(endDate) !== getDateTime(timeline.timelineEndDate)) {
+    return null;
+  }
+
+  const availablePresets = getAvailableScenarioRangePresets(timeline);
+
+  for (const preset of availablePresets) {
+    const presetDates = getScenarioDatesForRangePreset(preset.id, timeline);
+
+    if (getDateTime(presetDates.startDate) === getDateTime(startDate)) {
+      return preset.id;
+    }
+  }
+
+  return null;
 }
 
 export function dateOnlyFromIso(value: string) {

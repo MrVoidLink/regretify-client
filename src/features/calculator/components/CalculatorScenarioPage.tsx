@@ -28,13 +28,17 @@ import {
   clampProgress,
   dateToProgress,
   formatShortDate,
+  getActiveScenarioRangePresetId,
+  getAvailableScenarioRangePresets,
   getDefaultScenarioDates,
+  getScenarioDatesForRangePreset,
   minimumRangeProgress,
   monthLabels,
   progressFromChartX,
   progressToDate,
   shiftDatePart,
   type DatePart,
+  type ScenarioRangePresetId,
   type ScenarioTimelineModel,
 } from "@/features/calculator/lib/scenarioTimelineModel";
 import type {
@@ -47,6 +51,8 @@ function MarketChartModule({
   isDataReady,
   startDate,
   endDate,
+  activeRangePresetId,
+  onRangePresetSelect,
   onStartDateChange,
   onEndDateChange,
 }: {
@@ -54,6 +60,8 @@ function MarketChartModule({
   isDataReady: boolean;
   startDate: Date;
   endDate: Date;
+  activeRangePresetId: ScenarioRangePresetId | null;
+  onRangePresetSelect: (presetId: ScenarioRangePresetId) => void;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
 }) {
@@ -68,6 +76,7 @@ function MarketChartModule({
   const chartAreaPoints = `${chartLinePoints} 96,100 6,100`;
   const chartStartX = timeline.chartPoints[0]?.x ?? 6;
   const chartEndX = timeline.chartPoints[timeline.chartPoints.length - 1]?.x ?? 96;
+  const availableRangePresets = getAvailableScenarioRangePresets(timeline);
   const handles = [
     {
       id: "start-handle",
@@ -194,14 +203,20 @@ function MarketChartModule({
             Drag the handles or use the wheels to pick your start and end dates.
           </p>
         </div>
-        <div className="grid grid-cols-5 overflow-hidden rounded-[0.6rem] border border-[color:var(--color-border-ui-subtle)] text-[0.6rem] font-semibold text-zinc-600">
-          {["1Y", "2Y", "3Y", "5Y", "ALL"].map((range) => (
+        <div className="flex items-center gap-1 overflow-hidden rounded-[0.6rem] border border-[color:var(--color-border-ui-subtle)] p-0.5 text-[0.6rem] font-semibold text-zinc-600">
+          {availableRangePresets.map((preset) => (
             <button
-              key={range}
+              key={preset.id}
               type="button"
-              className={`min-h-6 px-1.5 ${range === "3Y" ? "bg-[var(--color-brand)] text-white" : "bg-white"}`}
+              disabled={!isDataReady}
+              onClick={() => onRangePresetSelect(preset.id)}
+              className={`min-h-6 rounded-[0.45rem] px-1.5 transition-colors ${
+                activeRangePresetId === preset.id
+                  ? "bg-[var(--color-brand)] text-white"
+                  : "bg-white text-zinc-600"
+              } ${isDataReady ? "" : "cursor-not-allowed opacity-60"}`}
             >
-              {range}
+              {preset.label}
             </button>
           ))}
         </div>
@@ -215,8 +230,8 @@ function MarketChartModule({
       ) : null}
 
       <div className="relative mt-1.5 min-h-[7.6rem] flex-1 overflow-hidden rounded-[0.8rem] bg-[linear-gradient(180deg,#ffffff_0%,#fbf9ff_100%)]">
-        <div className="absolute inset-y-3 left-0 z-10 w-12 text-[0.56rem] text-[var(--color-text-ui-muted)]">
-          {["Top", "", "", "Base"].map((tick, index) => (
+        <div className="absolute inset-y-3 left-0 z-10 w-16 pr-2 text-right text-[0.56rem] text-[var(--color-text-ui-muted)]">
+          {timeline.priceAxisLabels.map((tick, index) => (
             <span
               key={`${tick}-${index}`}
               className="absolute left-0"
@@ -227,7 +242,7 @@ function MarketChartModule({
           ))}
         </div>
 
-        <div className="absolute inset-y-3 right-0 left-12">
+        <div className="absolute inset-y-3 right-0 left-16">
           {[16, 42, 68, 94].map((top) => (
             <span
               key={top}
@@ -552,6 +567,8 @@ function LeftScenarioBuilder({
   onAmountChange,
   startDate,
   endDate,
+  activeRangePresetId,
+  onRangePresetSelect,
   onStartDateChange,
   onEndDateChange,
   onCalculate,
@@ -563,6 +580,8 @@ function LeftScenarioBuilder({
   onAmountChange: (amount: string) => void;
   startDate: Date;
   endDate: Date;
+  activeRangePresetId: ScenarioRangePresetId | null;
+  onRangePresetSelect: (presetId: ScenarioRangePresetId) => void;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
   onCalculate: () => void;
@@ -613,6 +632,8 @@ function LeftScenarioBuilder({
           isDataReady={isDataReady}
           startDate={startDate}
           endDate={endDate}
+          activeRangePresetId={activeRangePresetId}
+          onRangePresetSelect={onRangePresetSelect}
           onStartDateChange={handleStartDateChange}
           onEndDateChange={handleEndDateChange}
         />
@@ -663,6 +684,7 @@ export function CalculatorScenarioPage({
   const [startDate, setStartDate] = useState(() => initialDates.startDate);
   const [endDate, setEndDate] = useState(() => initialDates.endDate);
   const [hasCalculated, setHasCalculated] = useState(false);
+  const activeRangePresetId = getActiveScenarioRangePresetId(startDate, endDate, timeline);
 
   const scenarioResult = calculateScenarioResult({
     amount: Number(amount || "0"),
@@ -689,6 +711,13 @@ export function CalculatorScenarioPage({
   function handleEndDateChange(nextDate: Date) {
     setHasCalculated(false);
     setEndDate(nextDate);
+  }
+
+  function handleRangePresetSelect(presetId: ScenarioRangePresetId) {
+    const nextDates = getScenarioDatesForRangePreset(presetId, timeline);
+    setHasCalculated(false);
+    setStartDate(nextDates.startDate);
+    setEndDate(nextDates.endDate);
   }
 
   function scrollToPreviewPanel() {
@@ -729,6 +758,8 @@ export function CalculatorScenarioPage({
               onAmountChange={handleAmountChange}
               startDate={startDate}
               endDate={endDate}
+              activeRangePresetId={activeRangePresetId}
+              onRangePresetSelect={handleRangePresetSelect}
               onStartDateChange={handleStartDateChange}
               onEndDateChange={handleEndDateChange}
               onCalculate={handleCalculate}

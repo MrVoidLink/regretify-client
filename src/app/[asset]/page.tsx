@@ -74,6 +74,7 @@ export default async function AssetCalculatorRoute(
   const { asset: slug } = await props.params;
   const assetData = await loadAssetPageData(slug);
   const asset = assetData?.asset ?? null;
+  const history = assetData?.history ?? [];
 
   if (!asset) {
     notFound();
@@ -81,7 +82,11 @@ export default async function AssetCalculatorRoute(
 
   return (
     <>
-      <CalculatorScenarioPage asset={asset} history={assetData?.history ?? []} />
+      <CalculatorScenarioPage
+        key={`${asset.slug}-${history[0]?.date ?? "empty"}-${history[history.length - 1]?.date ?? "empty"}`}
+        asset={asset}
+        history={history}
+      />
       <section className="bg-[linear-gradient(180deg,#faf8ff_0%,#ffffff_42%,#fbf9ff_100%)] px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-[96rem] gap-5 xl:grid-cols-[minmax(0,1fr)_21rem] xl:items-start">
           <AssetCalculatorSeoMainContent asset={asset} />
