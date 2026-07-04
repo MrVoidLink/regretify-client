@@ -16,6 +16,8 @@ import {
   toCalculatorScenarioAsset,
 } from "@/features/calculator/lib/publicApi";
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   const assets = await fetchCalculatorAssets()
     .then((response) => response.items.map(toAssetSelectionAsset))
