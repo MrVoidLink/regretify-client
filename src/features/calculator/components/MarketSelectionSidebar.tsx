@@ -200,7 +200,7 @@ export function MarketSelectionSidebar({
   }, [selectedMarketId]);
 
   return (
-    <aside className="mobile-market-layout flex h-full w-full max-w-none flex-col md:grid md:grid-cols-[10.5rem_1fr] md:grid-rows-[auto_1fr] md:gap-x-4 md:gap-y-2 lg:grid lg:max-w-none lg:grid-rows-[auto_auto] lg:content-start lg:items-start lg:pt-0">
+    <aside className="mobile-market-layout flex h-full w-full max-w-none flex-col md:grid md:grid-cols-[10.5rem_1fr] md:grid-rows-[auto_1fr] md:gap-x-4 md:gap-y-2 lg:flex lg:max-w-none lg:flex-col lg:items-start lg:justify-start lg:pt-0">
       <div className="pt-0 sm:pt-0 md:pt-2 lg:pt-0">
         <h1 className="mobile-market-heading type-display mt-0.5 text-[clamp(1.24rem,5vw,1.38rem)] font-semibold text-zinc-950 sm:mt-5 sm:text-[2.8rem] md:mt-0 md:text-[1.42rem] lg:mt-3 lg:whitespace-nowrap lg:text-[clamp(1.92rem,2.2vw,2.55rem)]">
           Choose your market
@@ -214,7 +214,7 @@ export function MarketSelectionSidebar({
 
       <div
         ref={sliderRef}
-        className="mobile-market-row scrollbar-none -mx-1 mt-1.5 flex flex-1 snap-x snap-mandatory items-stretch gap-[clamp(0.4rem,1.8vw,0.4375rem)] overflow-x-auto overscroll-x-contain px-1 pb-1 md:col-start-2 md:row-span-2 md:mt-0 md:grid md:grid-cols-4 md:gap-2 md:overflow-visible md:px-0 md:pb-2 lg:mx-0 lg:mt-4 lg:flex-none lg:grid lg:grid-cols-1 lg:auto-rows-max lg:content-start lg:gap-2.5 lg:overflow-visible lg:px-0 lg:pb-0 min-[1800px]:mt-5 min-[1800px]:gap-3"
+        className="mobile-market-row scrollbar-none -mx-1 mt-1.5 flex flex-1 snap-x snap-mandatory items-stretch gap-[clamp(0.4rem,1.8vw,0.4375rem)] overflow-x-auto overscroll-x-contain px-1 pb-1 md:col-start-2 md:row-span-2 md:mt-0 md:grid md:grid-cols-4 md:gap-2 md:overflow-visible md:px-0 md:pb-2 lg:mx-0 lg:mt-4 lg:flex-none lg:grid lg:grid-cols-1 lg:gap-2.5 lg:overflow-visible lg:px-0 lg:pb-0 min-[1800px]:mt-5 min-[1800px]:gap-3"
       >
         {calculatorMarkets.map((market) => (
           <MarketCard
