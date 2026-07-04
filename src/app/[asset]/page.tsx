@@ -9,38 +9,38 @@ import {
   getCalculatorScenarioAssetBySlug,
 } from "@/features/calculator/lib/assets";
 import {
+  fetchCalculatorAssets,
   fetchCalculatorAssetBySlug,
   fetchCalculatorAssetHistory,
+  toAssetSelectionAsset,
   toCalculatorScenarioAsset,
 } from "@/features/calculator/lib/publicApi";
 
-export function generateStaticParams() {
-  return getAssetSelectionParams();
+export async function generateStaticParams() {
+  const assets = await fetchCalculatorAssets()
+    .then((response) => response.items.map(toAssetSelectionAsset))
+    .catch(() => assetSelectionAssets);
+
+  return getAssetSelectionParams(assets);
 }
 
 async function loadAssetPageData(slug: string) {
-  try {
-    const [asset, historyResponse] = await Promise.all([
-      fetchCalculatorAssetBySlug(slug),
-      fetchCalculatorAssetHistory(slug, { from: "2017-01-01" }),
-    ]);
+  const asset = await fetchCalculatorAssetBySlug(slug)
+    .then((response) => toCalculatorScenarioAsset(response))
+    .catch(() => getCalculatorScenarioAssetBySlug(slug, assetSelectionAssets));
 
-    return {
-      asset: toCalculatorScenarioAsset(asset),
-      history: historyResponse.items,
-    };
-  } catch {
-    const fallbackAsset = getCalculatorScenarioAssetBySlug(slug, assetSelectionAssets);
-
-    if (!fallbackAsset) {
-      return null;
-    }
-
-    return {
-      asset: fallbackAsset,
-      history: [],
-    };
+  if (!asset) {
+    return null;
   }
+
+  const history = await fetchCalculatorAssetHistory(slug, { from: "2017-01-01" })
+    .then((response) => response.items)
+    .catch(() => []);
+
+  return {
+    asset,
+    history,
+  };
 }
 
 export async function generateMetadata(
