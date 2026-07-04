@@ -6,6 +6,8 @@ const chartTop = 13;
 const chartBottom = 79;
 const chartSampleCount = 36;
 const chartVisualExponent = 0.78;
+const chartLinearWeight = 0.72;
+const chartLogWeight = 0.28;
 
 export const minimumRangeProgress = 0.35;
 
@@ -126,6 +128,63 @@ function formatPriceAxisLabel(value: number) {
   }).format(value);
 }
 
+function normalizePriceForChart(value: number, minPrice: number, maxPrice: number) {
+  if (
+    !Number.isFinite(value) ||
+    !Number.isFinite(minPrice) ||
+    !Number.isFinite(maxPrice) ||
+    value <= 0 ||
+    minPrice <= 0 ||
+    maxPrice <= minPrice
+  ) {
+    return 0.5;
+  }
+
+  const linearNormalized = (value - minPrice) / (maxPrice - minPrice);
+  const minLog = Math.log(minPrice);
+  const maxLog = Math.log(maxPrice);
+  const logRange = maxLog - minLog || 1;
+  const logNormalized = (Math.log(value) - minLog) / logRange;
+
+  return linearNormalized * chartLinearWeight + logNormalized * chartLogWeight;
+}
+
+function denormalizePriceForChart(
+  normalized: number,
+  minPrice: number,
+  maxPrice: number,
+) {
+  if (
+    !Number.isFinite(normalized) ||
+    !Number.isFinite(minPrice) ||
+    !Number.isFinite(maxPrice) ||
+    minPrice <= 0 ||
+    maxPrice <= minPrice
+  ) {
+    return maxPrice;
+  }
+
+  let low = minPrice;
+  let high = maxPrice;
+
+  for (let index = 0; index < 32; index += 1) {
+    const midpoint = (low + high) / 2;
+    const midpointNormalized = normalizePriceForChart(
+      midpoint,
+      minPrice,
+      maxPrice,
+    );
+
+    if (midpointNormalized < normalized) {
+      low = midpoint;
+    } else {
+      high = midpoint;
+    }
+  }
+
+  return (low + high) / 2;
+}
+
 function buildPriceAxisLabels(minPrice: number, maxPrice: number) {
   if (!Number.isFinite(minPrice) || !Number.isFinite(maxPrice) || minPrice <= 0 || maxPrice <= 0) {
     return ["--", "", "", "--"];
@@ -136,13 +195,11 @@ function buildPriceAxisLabels(minPrice: number, maxPrice: number) {
     return [label, "", "", label];
   }
 
-  const minLog = Math.log(minPrice);
-  const maxLog = Math.log(maxPrice);
-  const logRange = maxLog - minLog;
-
   return Array.from({ length: 4 }, (_, index) => {
     const ratio = index / 3;
-    return formatPriceAxisLabel(Math.exp(maxLog - ratio * logRange));
+    return formatPriceAxisLabel(
+      denormalizePriceForChart(1 - ratio, minPrice, maxPrice),
+    );
   });
 }
 
@@ -162,15 +219,14 @@ export function buildScenarioTimeline(history: CalculatorAssetHistoryPoint[]) {
     .map((point) => Number(point.closePrice))
     .filter((value) => Number.isFinite(value) && value > 0);
 
-  const minLog = closePrices.length ? Math.min(...closePrices.map((value) => Math.log(value))) : 0;
-  const maxLog = closePrices.length ? Math.max(...closePrices.map((value) => Math.log(value))) : 1;
-  const logRange = maxLog - minLog || 1;
+  const minPrice = closePrices.length ? Math.min(...closePrices) : 0;
+  const maxPrice = closePrices.length ? Math.max(...closePrices) : 1;
 
   const chartPoints = sampledHistory.map((point, index) => {
     const numericClosePrice = Number(point.closePrice);
     const normalized =
       Number.isFinite(numericClosePrice) && numericClosePrice > 0
-        ? (Math.log(numericClosePrice) - minLog) / logRange
+        ? normalizePriceForChart(numericClosePrice, minPrice, maxPrice)
         : 0.5;
     const visualNormalized = Math.pow(Math.min(1, Math.max(0, normalized)), chartVisualExponent);
 
@@ -192,7 +248,7 @@ export function buildScenarioTimeline(history: CalculatorAssetHistoryPoint[]) {
     timelineStartDate,
     timelineEndDate,
     yearLabels: buildYearLabels(timelineStartDate, timelineEndDate),
-    priceAxisLabels: buildPriceAxisLabels(Math.min(...closePrices), Math.max(...closePrices)),
+    priceAxisLabels: buildPriceAxisLabels(minPrice, maxPrice),
   } satisfies ScenarioTimelineModel;
 }
 
