@@ -124,22 +124,22 @@ function MarketCard({
       }}
       disabled={isDisabled}
       aria-pressed={isSelected}
-      className={`mobile-market-card flex min-h-0 w-[clamp(5.85rem,25vw,6.35rem)] shrink-0 snap-start flex-col items-center rounded-[1.22rem] border bg-white px-[clamp(0.48rem,2vw,0.56rem)] py-[clamp(0.48rem,2.05vw,0.6rem)] text-center shadow-[0_12px_26px_rgba(24,24,27,0.045)] transition-transform duration-200 md:h-full md:min-w-0 md:w-auto md:rounded-[1.3rem] md:px-2.5 md:py-3 lg:grid lg:min-h-[5.15rem] lg:w-auto lg:grid-cols-[3.2rem_1fr_auto] lg:items-center lg:gap-2.5 lg:rounded-[1.25rem] lg:bg-white/92 lg:px-3.5 lg:py-2.5 lg:text-left lg:shadow-[0_14px_30px_rgba(24,24,27,0.06)] xl:min-h-[5.35rem] ${
+      className={`mobile-market-card flex min-h-0 w-[clamp(5.85rem,25vw,6.35rem)] shrink-0 snap-start flex-col items-center rounded-[1.22rem] border bg-white px-[clamp(0.48rem,2vw,0.56rem)] py-[clamp(0.48rem,2.05vw,0.6rem)] text-center shadow-[0_12px_26px_rgba(24,24,27,0.045)] transition-transform duration-200 md:h-full md:min-w-0 md:w-auto md:rounded-[1.3rem] md:px-2.5 md:py-3 lg:grid lg:min-h-[5.3rem] lg:w-auto lg:grid-cols-[3.2rem_1fr_auto] lg:items-center lg:gap-2.5 lg:rounded-[1.25rem] lg:bg-white/92 lg:px-3.5 lg:py-3 lg:text-left lg:shadow-[0_14px_30px_rgba(24,24,27,0.06)] min-[1800px]:min-h-[5.85rem] min-[1800px]:grid-cols-[3.55rem_1fr_auto] min-[1800px]:gap-3 min-[1800px]:px-4 min-[1800px]:py-3.5 ${
         isDisabled ? "cursor-not-allowed opacity-52 saturate-75" : ""
       }`}
       style={{
         borderColor: isSelected ? `${market.accentColor}99` : "rgba(24,24,27,0.06)",
       }}
     >
-      <div className="mobile-market-icon-wrap mt-0 grid h-[clamp(2.8rem,11.8vw,3.2rem)] w-[clamp(2.8rem,11.8vw,3.2rem)] place-items-center border border-zinc-950/6 bg-white shadow-[0_12px_24px_rgba(24,24,27,0.09)] [clip-path:polygon(50%_0%,92%_25%,92%_75%,50%_100%,8%_75%,8%_25%)] md:h-[3.3rem] md:w-[3.3rem] lg:mt-0 lg:h-[2.95rem] lg:w-[2.95rem] lg:rounded-[0.95rem] lg:border lg:[clip-path:none] lg:shadow-[0_10px_22px_rgba(24,24,27,0.08)]">
+      <div className="mobile-market-icon-wrap mt-0 grid h-[clamp(2.8rem,11.8vw,3.2rem)] w-[clamp(2.8rem,11.8vw,3.2rem)] place-items-center border border-zinc-950/6 bg-white shadow-[0_12px_24px_rgba(24,24,27,0.09)] [clip-path:polygon(50%_0%,92%_25%,92%_75%,50%_100%,8%_75%,8%_25%)] md:h-[3.3rem] md:w-[3.3rem] lg:mt-0 lg:h-[2.95rem] lg:w-[2.95rem] lg:rounded-[0.95rem] lg:border lg:[clip-path:none] lg:shadow-[0_10px_22px_rgba(24,24,27,0.08)] min-[1800px]:h-[3.3rem] min-[1800px]:w-[3.3rem]">
         <MarketGlyph icon={market.icon} accentColor={market.accentColor} />
       </div>
 
       <div className="mobile-market-copy mt-0.75 flex min-w-0 flex-1 flex-col justify-center md:mt-3 lg:mt-0 lg:block">
-        <h3 className="mobile-market-title text-[clamp(0.68rem,2.7vw,0.72rem)] font-semibold leading-[1.08] tracking-[0.015em] text-zinc-950 md:text-[0.75rem] lg:text-[0.98rem] lg:tracking-[0.005em] xl:text-[1.06rem]">
+        <h3 className="mobile-market-title text-[clamp(0.68rem,2.7vw,0.72rem)] font-semibold leading-[1.08] tracking-[0.015em] text-zinc-950 md:text-[0.75rem] lg:text-[clamp(0.98rem,1vw,1.15rem)] lg:tracking-[0.005em]">
           {market.name}
         </h3>
-        <p className="mobile-market-text mt-0.5 px-0.5 text-[clamp(0.5rem,2vw,0.54rem)] leading-[1.28] tracking-[0.005em] text-zinc-700 md:mt-1.75 md:text-[0.6rem] md:leading-[1.42] lg:mt-1 lg:max-w-[10.25rem] lg:px-0 lg:text-[0.79rem] lg:leading-[1.4] xl:max-w-[11rem] xl:text-[0.83rem]">
+        <p className="mobile-market-text mt-0.5 px-0.5 text-[clamp(0.5rem,2vw,0.54rem)] leading-[1.28] tracking-[0.005em] text-zinc-700 md:mt-1.75 md:text-[0.6rem] md:leading-[1.42] lg:mt-1 lg:max-w-[10.75rem] lg:px-0 lg:text-[clamp(0.79rem,0.84vw,0.92rem)] lg:leading-[1.42] min-[1800px]:max-w-[12.5rem]">
           {market.description}
         </p>
         {isDisabled ? (
@@ -200,13 +200,13 @@ export function MarketSelectionSidebar({
   }, [selectedMarketId]);
 
   return (
-    <aside className="mobile-market-layout flex h-full w-full max-w-none flex-col md:grid md:grid-cols-[10.5rem_1fr] md:grid-rows-[auto_1fr] md:gap-x-4 md:gap-y-2 lg:flex lg:max-w-[18rem] lg:pt-0 xl:max-w-[18.75rem] xl:pt-0">
+    <aside className="mobile-market-layout flex h-full w-full max-w-none flex-col md:grid md:grid-cols-[10.5rem_1fr] md:grid-rows-[auto_1fr] md:gap-x-4 md:gap-y-2 lg:flex lg:max-w-none lg:pt-0">
       <div className="pt-0 sm:pt-0 md:pt-2 lg:pt-0">
-        <h1 className="mobile-market-heading type-display mt-0.5 text-[clamp(1.24rem,5vw,1.38rem)] font-semibold text-zinc-950 sm:mt-5 sm:text-[2.8rem] md:mt-0 md:text-[1.42rem] lg:mt-3 lg:whitespace-nowrap lg:text-[1.92rem] xl:text-[2rem]">
+        <h1 className="mobile-market-heading type-display mt-0.5 text-[clamp(1.24rem,5vw,1.38rem)] font-semibold text-zinc-950 sm:mt-5 sm:text-[2.8rem] md:mt-0 md:text-[1.42rem] lg:mt-3 lg:whitespace-nowrap lg:text-[clamp(1.92rem,2.2vw,2.55rem)]">
           Choose your market
         </h1>
 
-        <p className="mobile-market-description mt-1 max-w-[clamp(12rem,44vw,16rem)] text-[clamp(0.64rem,2.35vw,0.68rem)] leading-[1.42] text-[var(--color-text-ui-soft)] sm:mt-4 sm:max-w-[18rem] sm:text-[1.02rem] sm:leading-[1.55] md:mt-2.5 md:max-w-[9.5rem] md:text-[0.64rem] md:leading-[1.34] lg:mt-2.5 lg:max-w-[12rem] lg:text-[0.84rem] lg:leading-[1.42] xl:max-w-[12.5rem] xl:text-[0.88rem]">
+        <p className="mobile-market-description mt-1 max-w-[clamp(12rem,44vw,16rem)] text-[clamp(0.64rem,2.35vw,0.68rem)] leading-[1.42] text-[var(--color-text-ui-soft)] sm:mt-4 sm:max-w-[18rem] sm:text-[1.02rem] sm:leading-[1.55] md:mt-2.5 md:max-w-[9.5rem] md:text-[0.64rem] md:leading-[1.34] lg:mt-2.5 lg:max-w-[13rem] lg:text-[clamp(0.84rem,0.92vw,1rem)] lg:leading-[1.48] min-[1800px]:max-w-[14.5rem]">
           Pick a market first. Then choose the asset you wish you had bought
           earlier.
         </p>
@@ -214,7 +214,7 @@ export function MarketSelectionSidebar({
 
       <div
         ref={sliderRef}
-        className="mobile-market-row scrollbar-none -mx-1 mt-1.5 flex flex-1 snap-x snap-mandatory items-stretch gap-[clamp(0.4rem,1.8vw,0.4375rem)] overflow-x-auto overscroll-x-contain px-1 pb-1 md:col-start-2 md:row-span-2 md:mt-0 md:grid md:grid-cols-4 md:gap-2 md:overflow-visible md:px-0 md:pb-2 lg:mx-0 lg:mt-4 lg:grid lg:grid-cols-1 lg:gap-2 lg:overflow-visible lg:px-0 lg:pb-0 xl:mt-[1.125rem] xl:gap-[0.5625rem]"
+        className="mobile-market-row scrollbar-none -mx-1 mt-1.5 flex flex-1 snap-x snap-mandatory items-stretch gap-[clamp(0.4rem,1.8vw,0.4375rem)] overflow-x-auto overscroll-x-contain px-1 pb-1 md:col-start-2 md:row-span-2 md:mt-0 md:grid md:grid-cols-4 md:gap-2 md:overflow-visible md:px-0 md:pb-2 lg:mx-0 lg:mt-4 lg:grid lg:grid-cols-1 lg:gap-2.5 lg:overflow-visible lg:px-0 lg:pb-0 min-[1800px]:mt-5 min-[1800px]:gap-3"
       >
         {calculatorMarkets.map((market) => (
           <MarketCard

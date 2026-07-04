@@ -162,6 +162,24 @@ export const desktopMiniGameSceneProfile = buildMiniGameSceneProfile({
   targetWorldBasePosition,
 });
 
+export const desktopWideMiniGameSceneProfile = buildMiniGameSceneProfile({
+  characterStageHeight: miniGameCharacterStageHeight * 1.04,
+  characterStagePosition: new Vector3(-1.34, -0.04, 0.16),
+  targetScaleMultiplier: 1.04,
+  targetCollisionScaleMultiplier: 1.08,
+  targetCollisionWorldBasePosition: new Vector3(1.94, -0.06, 1.45),
+  targetWorldBasePosition: new Vector3(1.94, -0.06, 1.45),
+});
+
+export const desktopUltraWideMiniGameSceneProfile = buildMiniGameSceneProfile({
+  characterStageHeight: miniGameCharacterStageHeight * 1.08,
+  characterStagePosition: new Vector3(-1.22, -0.06, 0.16),
+  targetScaleMultiplier: 1.09,
+  targetCollisionScaleMultiplier: 1.14,
+  targetCollisionWorldBasePosition: new Vector3(1.78, -0.08, 1.45),
+  targetWorldBasePosition: new Vector3(1.78, -0.08, 1.45),
+});
+
 export const tabletMiniGameSceneProfile = buildMiniGameSceneProfile({
   characterStageHeight: miniGameCharacterStageHeight * 1.12,
   characterStagePosition: new Vector3(-0.92, -0.68, 0.16),

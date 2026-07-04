@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MarketSelectionSidebar } from "@/features/calculator/components/MarketSelectionSidebar";
 import { calculatorMarkets } from "@/features/calculator/data/markets";
 import type { CalculatorMarket } from "@/features/calculator/types";
@@ -94,7 +94,7 @@ function HudExpandIcon() {
 
 function MiniGameGuideStrip() {
   return (
-    <div className="hidden w-full max-w-[46rem] items-center justify-between divide-x divide-zinc-200/75 rounded-[1.35rem] border border-white/78 bg-white/88 px-5 py-2.5 shadow-[0_22px_50px_rgba(24,24,27,0.08)] backdrop-blur-md lg:flex">
+    <div className="hidden w-full max-w-[clamp(46rem,52vw,58rem)] items-center justify-between divide-x divide-zinc-200/75 rounded-[1.35rem] border border-white/78 bg-white/88 px-5 py-2.5 shadow-[0_22px_50px_rgba(24,24,27,0.08)] backdrop-blur-md lg:flex min-[1800px]:px-6 min-[1800px]:py-3">
       <div className="flex min-w-0 flex-1 items-center gap-2.5 pr-4">
         <HudMouseIcon />
         <div>
@@ -142,7 +142,7 @@ function MiniGameTelemetryPanel({
   const powerFillWidth = Math.max(powerPercent, 6);
 
   return (
-    <div className="hidden w-full max-w-[40rem] items-center gap-5 rounded-[1.35rem] border border-white/82 bg-white/90 px-6 py-3 shadow-[0_22px_50px_rgba(24,24,27,0.08)] backdrop-blur-md lg:flex">
+    <div className="hidden w-full max-w-[clamp(40rem,46vw,52rem)] items-center gap-5 rounded-[1.35rem] border border-white/82 bg-white/90 px-6 py-3 shadow-[0_22px_50px_rgba(24,24,27,0.08)] backdrop-blur-md lg:flex min-[1800px]:gap-6 min-[1800px]:px-7 min-[1800px]:py-3.5">
       <div className="flex min-w-[12rem] items-center gap-3">
         <HudExpandIcon />
         <div className="min-w-0">
@@ -290,10 +290,10 @@ function MiniGameStage({
   return (
     <div className="relative h-full min-h-[15.5rem] overflow-hidden rounded-[1.1rem] sm:min-h-[20rem] sm:rounded-[1.5rem] md:min-h-0 md:rounded-[1.55rem] lg:min-h-full lg:rounded-none">
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 px-3.5 pt-4 text-center sm:px-5 sm:pt-5 md:px-6 md:pt-4 lg:pt-8">
-        <div className="type-display text-[1.3rem] font-semibold text-zinc-950 sm:text-[2rem] md:text-[1.72rem] lg:text-[2.75rem]">
+        <div className="type-display text-[1.3rem] font-semibold text-zinc-950 sm:text-[2rem] md:text-[1.72rem] lg:text-[clamp(2.75rem,3.15vw,4.1rem)]">
           Take your shot
         </div>
-        <p className="mt-1 text-[0.76rem] text-[var(--color-text-ui-soft)] sm:text-[0.9rem] md:text-[0.82rem] lg:mt-1.5 lg:text-[0.94rem]">
+        <p className="mt-1 text-[0.76rem] text-[var(--color-text-ui-soft)] sm:text-[0.9rem] md:text-[0.82rem] lg:mt-1.5 lg:text-[clamp(0.94rem,1vw,1.18rem)]">
           Drag to draw, aim, and release
         </p>
       </div>
@@ -327,6 +327,7 @@ export function CalculatorHeroExperience() {
   const desktopHeroBackgroundImagePath = "/images/home/hero-background-test-backg-lite.webp";
   const mobileStageBackgroundImagePath = "/images/home/hero-stage-mobile-v4.png";
   const tabletStageBackgroundImagePath = "/images/home/hero-stage-tablet-v1.png";
+  const [viewportWidth, setViewportWidth] = useState(0);
   const [selectedMarketId, setSelectedMarketId] = useState<CalculatorMarket["id"]>(
     calculatorMarkets.find((market) => market.isSelected)?.id ?? calculatorMarkets[0].id,
   );
@@ -339,6 +340,24 @@ export function CalculatorHeroExperience() {
     targetAimAngle: 50,
     activeAimAnchorAngle: 50,
   });
+
+  useEffect(() => {
+    const updateViewportWidth = () => {
+      setViewportWidth(window.innerWidth);
+    };
+
+    updateViewportWidth();
+    window.addEventListener("resize", updateViewportWidth);
+
+    return () => {
+      window.removeEventListener("resize", updateViewportWidth);
+    };
+  }, []);
+
+  const desktopBackgroundSize =
+    viewportWidth >= 1900 ? "118% auto" : viewportWidth >= 1440 ? "108% auto" : "100% auto";
+  const desktopBackgroundPosition =
+    viewportWidth >= 1800 ? "center 42%" : viewportWidth >= 1440 ? "center 46%" : "center center";
 
   return (
     <section className="mobile-profile-shell relative -mt-16 min-h-[100dvh] overflow-hidden pt-16 md:-mt-20 md:h-[100dvh] md:pt-20 lg:h-auto lg:min-h-[100dvh] lg:-mt-[4.5rem] lg:pt-[4.5rem]">
@@ -374,9 +393,9 @@ export function CalculatorHeroExperience() {
         style={{
           backgroundColor: "#050715",
           backgroundImage: `url('${desktopHeroBackgroundImagePath}')`,
-          backgroundPosition: "center center",
+          backgroundPosition: desktopBackgroundPosition,
           backgroundRepeat: "no-repeat",
-          backgroundSize: "100% auto",
+          backgroundSize: desktopBackgroundSize,
           filter: "saturate(1.02) brightness(1) contrast(1)",
           opacity: 1,
         }}
@@ -408,7 +427,7 @@ export function CalculatorHeroExperience() {
           opacity: 0,
         }}
       />
-      <div className="mobile-profile-grid mx-auto grid min-h-[calc(100dvh-4rem)] w-full max-w-[96rem] grid-cols-1 grid-rows-[minmax(10.5rem,3fr)_minmax(11.5rem,2fr)] gap-2.5 px-3 py-2.5 sm:gap-4 sm:px-8 sm:py-6 sm:grid-rows-[minmax(12rem,3fr)_minmax(12.5rem,2fr)] md:h-full md:min-h-0 md:grid-rows-[minmax(0,3fr)_minmax(0,1fr)] md:px-6 md:py-4 lg:h-auto lg:grid-cols-[18rem_1fr] lg:grid-rows-1 lg:content-start lg:gap-2 lg:px-8 lg:py-3 xl:grid-cols-[18.75rem_1fr] xl:gap-3">
+      <div className="mobile-profile-grid mx-auto grid min-h-[calc(100dvh-4rem)] w-full max-w-[96rem] grid-cols-1 grid-rows-[minmax(10.5rem,3fr)_minmax(11.5rem,2fr)] gap-2.5 px-3 py-2.5 sm:gap-4 sm:px-8 sm:py-6 sm:grid-rows-[minmax(12rem,3fr)_minmax(12.5rem,2fr)] md:h-full md:min-h-0 md:grid-rows-[minmax(0,3fr)_minmax(0,1fr)] md:px-6 md:py-4 lg:h-auto lg:max-w-[108rem] lg:grid-cols-[clamp(18rem,18vw,21.5rem)_minmax(0,1fr)] lg:grid-rows-1 lg:content-start lg:gap-3 lg:px-8 lg:py-3 min-[1800px]:max-w-[118rem] min-[1800px]:grid-cols-[clamp(20rem,19vw,23rem)_minmax(0,1fr)] min-[1800px]:gap-4">
         <div className="relative order-2 h-full lg:order-1">
           <div className="absolute inset-x-0 -top-[7.15rem] z-10 hidden justify-center md:flex lg:hidden">
             <MiniGameMobileInstructionPanel
@@ -417,7 +436,7 @@ export function CalculatorHeroExperience() {
               telemetry={miniGameTelemetry}
             />
           </div>
-          <div className="mobile-market-shell relative h-full overflow-hidden rounded-[1.35rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.74)_0%,rgba(249,246,255,0.8)_100%)] p-3 shadow-[0_16px_38px_rgba(24,24,27,0.04)] backdrop-blur-[2px] sm:rounded-[1.5rem] sm:p-5 md:rounded-[1.65rem] md:p-4 lg:px-3 lg:py-7 xl:py-8">
+          <div className="mobile-market-shell relative h-full overflow-hidden rounded-[1.35rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.74)_0%,rgba(249,246,255,0.8)_100%)] p-3 shadow-[0_16px_38px_rgba(24,24,27,0.04)] backdrop-blur-[2px] sm:rounded-[1.5rem] sm:p-5 md:rounded-[1.65rem] md:p-4 lg:px-4 lg:py-7 min-[1800px]:px-5 min-[1800px]:py-8">
             <MarketSelectionSidebar
               selectedMarketId={selectedMarketId}
               onSelectedMarketChange={setSelectedMarketId}
@@ -425,7 +444,7 @@ export function CalculatorHeroExperience() {
           </div>
         </div>
 
-        <div className="mobile-stage-shell relative order-1 h-full rounded-[1.35rem] p-2.5 sm:rounded-[1.75rem] sm:p-5 md:rounded-[1.85rem] md:p-4 lg:order-2 lg:min-h-[calc(100dvh-7.75rem)] lg:p-0">
+        <div className="mobile-stage-shell relative order-1 h-full rounded-[1.35rem] p-2.5 sm:rounded-[1.75rem] sm:p-5 md:rounded-[1.85rem] md:p-4 lg:order-2 lg:min-h-[clamp(42rem,calc(100dvh-7.75rem),56rem)] lg:p-0 min-[1800px]:min-h-[clamp(46rem,calc(100dvh-8rem),62rem)]">
           <MiniGameStage
             accentColor={selectedMarket.accentColor}
             onTelemetryChange={setMiniGameTelemetry}

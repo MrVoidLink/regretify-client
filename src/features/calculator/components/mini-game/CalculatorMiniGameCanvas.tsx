@@ -7,7 +7,9 @@ import type { RootState } from "@react-three/fiber";
 import { getConsoleFunction, setConsoleFunction } from "three";
 import type { CalculatorMarketId } from "@/features/calculator/types";
 import {
+  desktopUltraWideMiniGameSceneProfile,
   desktopMiniGameSceneProfile,
+  desktopWideMiniGameSceneProfile,
   mobileMiniGameSceneProfile,
   showMiniGameDebugPanel,
   showPredictedImpactDebugMarker,
@@ -255,11 +257,29 @@ export function CalculatorMiniGameCanvas({
         return;
       }
 
+      if (window.innerWidth < 1440) {
+        setCameraPreset({
+          fov: 19,
+          position: [0, 0.2, 10.1],
+        });
+        setSceneProfile(desktopMiniGameSceneProfile);
+        return;
+      }
+
+      if (window.innerWidth < 1800) {
+        setCameraPreset({
+          fov: 18.2,
+          position: [0.14, 0.16, 9.72],
+        });
+        setSceneProfile(desktopWideMiniGameSceneProfile);
+        return;
+      }
+
       setCameraPreset({
-        fov: 19,
-        position: [0, 0.2, 10.1],
+        fov: 17.4,
+        position: [0.26, 0.12, 9.28],
       });
-      setSceneProfile(desktopMiniGameSceneProfile);
+      setSceneProfile(desktopUltraWideMiniGameSceneProfile);
     };
 
     updateCameraPreset();
