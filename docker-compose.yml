@@ -1,11 +1,12 @@
 services:
   client:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    pull_policy: build
-    image: regretify-client:latest
+    image: ghcr.io/mrvoidlink/regretify-client:main
+    pull_policy: always
     restart: unless-stopped
+    mem_limit: 160m
+    pids_limit: 128
+    security_opt:
+      - no-new-privileges:true
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-3000}
